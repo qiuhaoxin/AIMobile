@@ -4,7 +4,9 @@
   "description": "web app for AI ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node script/start.js",
+    "build": "node script/build.js"
   },
   "keywords": [
     "AI"
@@ -13,13 +15,40 @@
   "license": "ISC",
   "dependencies": {
     "classnames": "^2.2.6",
+    "isomorphic-fetch": "^2.2.1",
     "prop-types": "^15.6.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.3.1",
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.3.0",
     "webpack": "^4.12.1"
   },
   "devDependencies": {
+    "autoprefixer": "^8.6.4",
     "babel": "^6.23.0",
-    "babel-core": "^6.26.3"
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-react-app": "^3.1.2",
+    "chalk": "^2.4.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "css-loader": "^0.28.11",
+    "cssnano": "^3.10.0",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
+    "less": "^3.0.4",
+    "less-loader": "^4.1.0",
+    "open-browser-webpack-plugin": "0.0.5",
+    "postcss-aspect-ratio-mini": "0.0.2",
+    "postcss-cssnext": "^3.1.0",
+    "postcss-flexbugs-fixes": "^3.3.1",
+    "postcss-loader": "^2.1.5",
+    "postcss-px-to-viewport": "0.0.3",
+    "postcss-viewport-units": "^0.1.4",
+    "postcss-write-svg": "^3.0.1",
+    "style-loader": "^0.21.0",
+    "webpack-dev-server": "^3.1.4"
   }
 }

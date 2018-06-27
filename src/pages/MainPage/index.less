@@ -1,0 +1,42 @@
+body,div,ul,li{
+	padding:0;margin:0;
+}
+.wrapper{
+	display:flex;font-size:40px;position:absolute;left:0;width:100%;top:0;height:100%;flex-direction:column;width:100%;
+
+	& .row{
+	   padding:10px 20px;
+	}
+
+	& .appList{
+
+	   & > li{
+	      padding:10px 20px;display:flex;flex-direction:row;
+	      position:relative;
+	      &:after{
+	         content:'';position:absolute;height:1px;background-color:#ddd;left:20px;right:20px;bottom:0;transform:scaleY(.5);
+	      }
+	      & .iconPath{
+	          width:100px;
+	      }
+	      & .content{
+             flex:1;
+	         &>span{
+	            display:block;padding:6px;
+	            &.tip{
+                   font-size:34px;
+	            }
+	         }
+	      }
+	      & .arrow{
+             width:80px;position:relative;display:inline-flex;align-items:center;
+             &:before{
+                content:'';position:absolute;left:20px;border-left:12px solid #000;border-top:12px solid transparent;border-bottom:12px solid transparent;
+             }
+             &:after{
+                content:'';position:absolute;left:18px;border-left:12px solid #fff;border-top:12px solid transparent;border-bottom:12px solid transparent;
+             }
+	      }
+	   }
+	}
+}
