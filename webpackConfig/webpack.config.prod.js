@@ -185,7 +185,7 @@ module.exports={
               )
            },
            {
-           	  test:/\.(jpe?g|pgn|svg|gif)/,
+           	  test:/\.(jpe?g|png|svg|gif)/,
            	  loader:'url-loader',
            	  options:{
            	  	limit:8192,

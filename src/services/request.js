@@ -32,6 +32,7 @@ export default function request(url,options){
    const defaultOptions={
    	  //credentials:'include',
    };
+   console.log("options is "+JSON.stringify(options));
    const newOptions={...defaultOptions,...options};
    if(newOptions.method=='POST'||newOptions.method=='PUT'){
    	  newOptions.headers={

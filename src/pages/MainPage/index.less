@@ -3,40 +3,67 @@ body,div,ul,li{
 }
 .wrapper{
 	display:flex;font-size:40px;position:absolute;left:0;width:100%;top:0;height:100%;flex-direction:column;width:100%;
-
-	& .row{
-	   padding:10px 20px;
-	}
+    & .header{
+       flex:1;overflow-y:scroll;
+       & .rowTitle{
+	       margin-top:72px;padding-left:60px;font-size:40px;color:#333;font-family:'Microsoft YaHei';
+	   }
+	   & .row{
+	      padding-left:60px;margin-top:24px;font-size: 32px;color: #2A2A30;line-height: 22px;
+	   }
 
 	& .appList{
-
+       margin-top:72px;
 	   & > li{
-	      padding:10px 20px;display:flex;flex-direction:row;
+	      padding:20px 60px;display:flex;flex-direction:row;
 	      position:relative;
 	      &:after{
-	         content:'';position:absolute;height:1px;background-color:#ddd;left:20px;right:20px;bottom:0;transform:scaleY(.5);
+	         content:'';position:absolute;height:1px;background-color:#e5e5e5;left:60px;right:60px;bottom:0;
 	      }
 	      & .iconPath{
-	          width:100px;
+	          width:156px;display:inline-flex;align-items:center;
+	          &>img{
+	             width:104px;height:104px;
+	          }
 	      }
 	      & .content{
              flex:1;
 	         &>span{
-	            display:block;padding:6px;
+	            display:block;
 	            &.tip{
-                   font-size:34px;
+                   font-size:28px;color:#999;margin-top:8px;
+	            }
+	            &.title{
+	               font-size:30px;color:#2A2A30;
 	            }
 	         }
 	      }
 	      & .arrow{
              width:80px;position:relative;display:inline-flex;align-items:center;
              &:before{
-                content:'';position:absolute;left:20px;border-left:12px solid #000;border-top:12px solid transparent;border-bottom:12px solid transparent;
+                content:'';position:absolute;border-left:16px solid #C0C7CE;border-top:16px solid transparent;border-bottom:16px solid transparent;right:0;
              }
              &:after{
-                content:'';position:absolute;left:18px;border-left:12px solid #fff;border-top:12px solid transparent;border-bottom:12px solid transparent;
+                content:'';position:absolute;border-left:16px solid #fff;border-top:16px solid transparent;border-bottom:16px solid transparent;right:2px;
              }
 	      }
+	      &:last-child{
+	        &:after{
+
+	        }
+	      }
+	   }
+	}
+    }
+
+
+	& .footer{
+	   height:200px;width:100%;justify-content:center;align-items:center;z-index:101;display:flex;
+	   & .ball{
+           height:128px;width:128px;border-radius:50%;background:radial-gradient(circle at 64px 64px,#46e6ff,#3cbaff);
+	   }
+	   & img{
+	      height:72px;margin-left:42px;margin-top:28px;
 	   }
 	}
 }
