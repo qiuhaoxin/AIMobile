@@ -5,8 +5,13 @@ import {isEmpty} from './utils';
 
 //是否运行在云之家
 export const isYZJ=()=>{
-	console.log("sdfds");
+	//alert(navigator.userAgent)
 	return navigator.userAgent.match(/Qing\/.*;(iOS|iPhone|Android).*/)?true:false; 
+}
+//获取云之家语音
+export const getYZJLang=()=>{
+  const userAgent=navigator.userAgent;
+  return (/lang\:zh\-/g).test(userAgent)==true ? 'chinese' : 'english';
 }
 
 //获取操作系统平台，
@@ -121,6 +126,39 @@ export const speak=(fn)=>{
 
      },function(result){
         fn && fn(result);
+    })
+}
+
+
+/*
+*暂停播报
+*/
+export const stopPlayVoice=(fn)=>{
+   XuntongJSBridge.call('stopVoice', {localId:this.localId},
+      function(result){
+        fn && fn(result);
+      }
+  );
+}
+
+
+/*
+* 语音播报接口
+*/
+export const playVoice=(msgContent,fn)=>{
+    XuntongJSBridge.call('voiceSynthesize',{
+        'text':msgContent,
+        'voiceName':'xiaoyan'
+    },function(result){
+      if (result.success == true || result.success == 'true') {
+            //_this.localId = result.data.localId;
+            const localId=result.data.localId;
+            const len = result.data.len;
+            XuntongJSBridge.call('playVoice', { localId:localId},
+                function(result) {
+                fn && fn(result);
+            });
+      }
     })
 }
 

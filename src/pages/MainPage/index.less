@@ -1,17 +1,46 @@
 body,div,ul,li{
 	padding:0;margin:0;
 }
+.dialog{
+	font-size:30px;margin-left:60px;margin-right:144px;margin-top:20px;
+}
+.dialogContent{
+	width:100%;display:inline-flex;
+	&-left,&-right{
+       width:50%;display:flex;flex-direction:column;
+	}
+	&-right{
+	   justify-content:flex-end;align-items:flex-end;
+	}
+	& .loc{
+	   font-size:32px;color:#333;
+	}
+	& .time{
+	   font-size:26px;color:#999;margin-top:8px;
+	}
+}
 .wrapper{
 	display:flex;font-size:40px;position:absolute;left:0;width:100%;top:0;height:100%;flex-direction:column;width:100%;
     & .header{
-       flex:1;overflow-y:scroll;
+       flex:1;
        & .rowTitle{
 	       margin-top:72px;padding-left:60px;font-size:40px;color:#333;font-family:'Microsoft YaHei';
 	   }
 	   & .row{
 	      padding-left:60px;margin-top:24px;font-size: 32px;color: #2A2A30;line-height: 22px;
 	   }
-
+    & .dialogList{
+       width:100%;position:absolute;left:0;z-index:101;overflow:scroll;top:0;height:800px;bottom:80px;padding-bottom:90px;
+       & .dialog-row{
+          width:60%;display:flex;margin-top:72px;font-size:32px;color:#333;line-height:44px;font-family:PingFangSC-Regular;
+          &.user-dialog{
+              float:right;text-align:right;margin-right:60px;justify-content:flex-end;
+          }
+          &.chatbot-dialog{
+              float:left;text-align:left;margin-left:60px;
+          }
+       }
+    }
 	& .appList{
        margin-top:72px;
 	   & > li{
@@ -58,9 +87,12 @@ body,div,ul,li{
 
 
 	& .footer{
-	   height:200px;width:100%;justify-content:center;align-items:center;z-index:101;display:flex;
+	   width:100%;justify-content:center;align-items:center;z-index:101;display:flex;position:fixed;left:0;right:0;bottom:0;z-index:110;background-color:#fff;flex:1;height:534px;
 	   & .ball{
            height:128px;width:128px;border-radius:50%;background:radial-gradient(circle at 64px 64px,#46e6ff,#3cbaff);
+	   }
+	   & .test{
+	      background-image: linear-gradient(-180deg, #5FE5FF 0%, rgba(93,78,255,0.56) 100%);width:300px;height:50px;
 	   }
 	   & img{
 	      height:72px;margin-left:42px;margin-top:28px;

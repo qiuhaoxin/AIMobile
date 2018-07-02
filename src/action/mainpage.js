@@ -1,4 +1,4 @@
-import {getMainPageData,uploadLoc,tongyinConvert} from '../services/api';
+import {getMainPageData,uploadLoc,tongyinConvert,chat,getChatSessionId} from '../services/api';
 import * as ActionType from './actionType';
 export const changeLoading=flag=>{
 	return ({
@@ -7,11 +7,11 @@ export const changeLoading=flag=>{
 	})
 }
 //获取小K的配置信息
-export const fetchMainPageData=(showLoading,payload)=>{
+export const fetchMainPageData=(payload)=>{
 	console.log("payload is "+JSON.stringify(payload));
     return async dispatch=>{
     	//
-    	dispatch(changeLoading(showLoading));
+    //	dispatch(changeLoading(showLoading));
     	try{
             const response=await getMainPageData(payload);
             dispatch({
@@ -31,7 +31,7 @@ export const fetchMainPageData=(showLoading,payload)=>{
     locStr:位置信息 目前只是传市
 }
 */
-export const uploadLocation=(loc,payload)=>{
+export const uploadLocation=(payload)=>{
     console.log("payload in mainpage is "+JSON.stringify(payload));
    return async dispatch=>{
       try{
@@ -50,10 +50,53 @@ export const uploadLocation=(loc,payload)=>{
 * 同音词转换
 
 */
-export const tongyinconvert=(text)=>{
+export const tongyinconvert=(payload)=>{
    return async dispatch=>{
       try{
-        const response=await tongyinConvert(payload)
+        const response=await tongyinConvert(payload);
+
+        dispatch({
+          type:ActionType.TONG_YIN_CONVERT,
+          payload:response['text'],
+        })
+      }catch(e){
+
+      }
+   }
+}
+
+export const getSessionId=(payload)=>{
+    console.log("getSessionId payload is "+JSON.stringify(payload));
+    return async dispatch=>{
+      try{
+        const response=await getChatSessionId(payload);
+        console.log("response is "+JSON.stringify(response));
+
+        dispatch({
+          type:ActionType.FETCH_SESSION_ID,
+          payload:response['chatSessionID'],
+        })
+      }catch(e){
+
+      }
+    }
+}
+
+/*
+* 对话
+  payload{
+     sessionId:'',
+     text:'',
+  }
+*/
+export const chatDialog=(payload)=>{
+   return async dispatch=>{
+      try{
+        const response=await chat(payload);
+        dispatch({
+          type:ActionType.CHAT,
+          payload:JSON.parse(response['message']),
+        })
       }catch(e){
 
       }

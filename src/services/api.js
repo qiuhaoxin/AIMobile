@@ -35,3 +35,21 @@ export const tongyinConvert=(params)=>{
 	})
 }
 
+/*
+* 获取对话 chatSessionID
+*/
+export const getChatSessionId=(params)=>{
+	return request(urlPath+"/fetchSessionId",{
+		method:'POST',
+		body:params,
+	})
+}
+
+//对话接口
+export const chat=(params)=>{
+	return request(urlPath + "/chatto",{
+		method:'POST',
+		body:params,
+	})
+}
+
