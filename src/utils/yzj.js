@@ -129,12 +129,11 @@ export const speak=(fn)=>{
     })
 }
 
-
 /*
 *暂停播报
 */
-export const stopPlayVoice=(fn)=>{
-   XuntongJSBridge.call('stopVoice', {localId:this.localId},
+export const stopPlayVoice=(localId,fn)=>{
+   XuntongJSBridge.call('stopVoice', {localId:localId},
       function(result){
         fn && fn(result);
       }
@@ -156,9 +155,21 @@ export const playVoice=(msgContent,fn)=>{
             const len = result.data.len;
             XuntongJSBridge.call('playVoice', { localId:localId},
                 function(result) {
-                fn && fn(result);
+                fn && fn(localId,result);
             });
       }
+    })
+}
+
+/*
+* 云之家 返回按钮
+*/
+export const backYZJ=(fn)=>{
+    XuntongJSBridge.call('defback', {}, function () {
+        fn && fn();
+        //if (history.length <= 1) { //顶级页面，则关闭当前Web
+        XuntongJSBridge.call('closeWebView');
+                
     })
 }
 

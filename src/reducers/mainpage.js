@@ -1,12 +1,11 @@
 import * as ActionType from '../action/actionType';
-console.log("actionofsdfsd type is "+ActionType.FETCH_SESSION_ID);
 let initState={
    title:'小K,您好',
    appList:[],
    sessionId:"-99",
    message:{},//对话返回结果
+   kdIntention:{},
    text:'',//同音转换结果
-   
 }
 
 const mainpage=(state=initState,action)=>{
@@ -21,12 +20,14 @@ const mainpage=(state=initState,action)=>{
             return {
               ...state,
               text:action.payload,
+              message:null,//置为null，避免主页在同音词转换和请求chat接口直接循环请求
             }
         break;
         case ActionType.CHAT:
             return {
               ...state,
-              message:action.payload,
+              ...action.payload,
+              text:'',//置为空，避免主页在同音词转换和请求chat接口直接循环请求
             }
         break;
         case ActionType.FETCH_SESSION_ID:

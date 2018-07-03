@@ -11,7 +11,7 @@ class Router extends Component{
 		return (
 	        <HashRouter>
 	            <Switch>
-	                <Route path="/mainpage/:appid/:uname/:openId" component={MainPage} />
+	                <Route path="/mainpage" component={MainPage} />
 	                <Redirect to="/mainpage"/>
 	            </Switch>
 	        </HashRouter>
@@ -19,3 +19,6 @@ class Router extends Component{
 	}
 }
 export default Router;
+/*
+*appid/:uname/:openId
+*/

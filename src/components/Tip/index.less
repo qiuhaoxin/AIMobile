@@ -1,6 +1,12 @@
-.tipWrapper{
+.tip-Wrapper{
     background-color:#E7F3FF;position:fixed;left:0;right:0;z-index:200;top:0;
-    transform:translate(0,0%);
+    transition:tranform .2s linear;
+    &.tip-show{
+        transform:translate(0,0%);
+    }
+    &.tip-hide{
+        transform:translate(0,-100%);
+    }
 	& .tipRow{
 		font-family: PingFangSC-Regular;
 		font-size: 22px;

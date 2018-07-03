@@ -48,13 +48,12 @@ export const uploadLocation=(payload)=>{
 
 /*
 * 同音词转换
-
 */
 export const tongyinconvert=(payload)=>{
    return async dispatch=>{
       try{
         const response=await tongyinConvert(payload);
-
+        console.log("response is "+JSON.stringify(response));
         dispatch({
           type:ActionType.TONG_YIN_CONVERT,
           payload:response['text'],
@@ -70,7 +69,6 @@ export const getSessionId=(payload)=>{
     return async dispatch=>{
       try{
         const response=await getChatSessionId(payload);
-        console.log("response is "+JSON.stringify(response));
 
         dispatch({
           type:ActionType.FETCH_SESSION_ID,
@@ -93,9 +91,10 @@ export const chatDialog=(payload)=>{
    return async dispatch=>{
       try{
         const response=await chat(payload);
+        //console.log("response is "+JSON.stringify(response));
         dispatch({
           type:ActionType.CHAT,
-          payload:JSON.parse(response['message']),
+          payload:{message:JSON.parse(response['message']),kdIntention:JSON.parse(response['kdIntention'])},
         })
       }catch(e){
 
