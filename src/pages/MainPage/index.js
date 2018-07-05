@@ -23,6 +23,7 @@ const SOURCE_ADDRESS="出发地",TARGET_ADDRESS='目的地',BEGIN_TIME="出发�
 class MainPage extends Component{
   	constructor(props){
   		super(props);
+      this.tipContent="";
   	}
     state={
       dialogList:[],
@@ -246,11 +247,20 @@ class MainPage extends Component{
           },150)
       }
     }
+    getReason=(kdWordslots,key)=>{
+       const result=kdWordslots.filter(kdWordslot=>kdWordslot['number']==key)[0];
+       if(result){
+           return result['originalWord'];
+       }
+    }
     //意图切换弹出提示框
     dealTip=(info)=>{
-        const {intention,kdWordslots}=info;
+        const {intention,kdWordslots,intentionName}=info;
         console.log("info is "+intention+" and kdWordslots is "+JSON.stringify(kdWordslots));
+
         if(intention=='BUS_TRIP'){
+          const reason=this.getReason(kdWordslots,'user_reason');
+          this.tipContent= reason ? reason : '未完成的'+intentionName;
           //出差申请
           this.setState({
               showTip:true,
@@ -371,10 +381,16 @@ class MainPage extends Component{
     )
   }
   handleTipClick=(data)=>{
+      const _this=this;
       console.log("data is "+JSON.stringify(data));
       const {intention,kdWordslots,say}=data;
       let dialog=this.state.dialogList;
       if(intention=='BUS_TRIP'){
+        if(isYZJ()){
+          playVoice(say,(localId)=>{
+             _this.localId=localId;
+          })
+        }
         dialog.push({className:'chatbot-dialog',text:say,id:FilterMaxId(dialog,'id'),kdIntention:{intention,kdWordslots},type:'TEXT'});
         this.setState({
           dialogList:dialog,
@@ -394,7 +410,8 @@ class MainPage extends Component{
                    <div className={Styles.row}>{HELP_TITLE_TWO}</div>
                    {this.renderAppList()}
                  </div>
-                  <Tip className={Styles.Tip} content={'北京客户大会出差申请'} data={lastUnfinishedIntention} onClick={this.handleTipClick} icon={require('../../images/text.png')} visible={showTip}/>
+                  <Tip className={Styles.Tip} content={this.tipContent} data={lastUnfinishedIntention} onClick={this.handleTipClick} 
+                  icon={require('../../images/text.png')} visible={showTip}/>
                  {this.renderDialogList()}
                  {this.transformDialog()}
              </div>

@@ -3,7 +3,6 @@ const path=require('path');
 const HtmlWebpackPlugin=require('html-webpack-plugin');
 const paths=require('./paths');
 const OpenBrowser=require('open-browser-webpack-plugin');
-
 /*
 * postcss
 */
@@ -170,6 +169,9 @@ module.exports={
     publicPath: "/"
   },
     plugins:[
+       new webpack.DefinePlugin({
+          REQUESTURL:JSON.stringify('test'),
+       }),
        new HtmlWebpackPlugin({
           template:paths.appHtml,
           inject:true,

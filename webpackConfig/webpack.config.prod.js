@@ -36,7 +36,7 @@ module.exports={
 	output:{
 		path:path.resolve(__dirname,'../dist'),
 		filename:'static/js/[name].[hash:8].js',
-		publicPath:'./',
+		publicPath:'../',
 	},
 	resolve:{
 		extensions:['.js','.jsx','.css','.less'],
@@ -199,10 +199,14 @@ module.exports={
 		]
 	},
 	plugins:[
+       new webpack.DefinePlugin({
+          REQUESTURL:JSON.stringify('prod'),   //记得用JSON.stringify() 或 '"prod"'
+       }),
        new cleanWebpackPlugin(pathToClean,{root:path.resolve(__dirname,"../")}),
        new HtmlWebpackPlugin({
        	  template:path.resolve(__dirname,'../src/public/index.html'),
        	  title:'test layout',
+          filename:'template/index.html',
        	  inject:true,
        }),
        new ExtractTextPlugin({

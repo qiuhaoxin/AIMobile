@@ -2,11 +2,20 @@
 require('isomorphic-fetch');
 import request from './request.js';
 
+const urlObj={
+	'test':'http://172.20.71.86:8888/rest/chatbot',
+	'prod':'./',
+}
+
 //172.20.71.86
 //const urlPath="http://192.168.206.72/LightApp/data/";
 //const urlPath="./";
-const urlPath="http://172.20.71.86:8888/rest/chatbot";
+let urlPath="http://172.20.71.86:8888/rest/chatbot";
 
+if(REQUESTURL){
+	console.log("REQUESTURL is "+REQUESTURL);
+	urlPath=urlObj[REQUESTURL];
+}
 //获取chatbot配置信息
 export function getMainPageData(params){
 	return request(urlPath+"/getmainpagedata",{
