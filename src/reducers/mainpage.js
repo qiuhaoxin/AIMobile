@@ -1,4 +1,5 @@
 import * as ActionType from '../action/actionType';
+console.log("exception actiontype is "+ActionType.EXCEPTION);
 let initState={
    title:'小K,您好',
    appList:[],
@@ -7,6 +8,7 @@ let initState={
    kdIntention:{},//会话当前的 意图及词槽
    lastUnfinishedIntention:{},
    text:'',//同音转换结果
+   exception:'',//异常
 }
 
 const mainpage=(state=initState,action)=>{
@@ -35,6 +37,14 @@ const mainpage=(state=initState,action)=>{
            return {
               ...state,
               sessionId:action.payload,
+           }
+        break;
+        case ActionType.EXCEPTION://异常处理
+           console.log("exc is "+action);
+           return {
+              ...state,
+              exception:action.payload,
+              text:'',
            }
         break;
         default:

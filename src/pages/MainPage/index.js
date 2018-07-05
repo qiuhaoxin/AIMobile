@@ -37,6 +37,30 @@ class MainPage extends Component{
         })
        }
     }
+    componentWillReceiveProps(nextProps){
+      //console.log("nextProps is "+JSON.stringify(nextProps));
+      if(!isEmpty(nextProps.exception) && nextProps.exception!=null){
+          alert(nextProps.exception);
+         //console.log("exception in mainpage is "+nextProps.exception);
+      }
+      //接收消息
+      if(nextProps.message!=null){
+         // alert("nextProps is "+JSON.stringify(nextProps));
+          this.acceptMessage(nextProps);
+          //this.transformDialog();
+      }
+      //同音转换发送消息
+      if(!isEmpty(nextProps.text)){
+          //alert("text is "+nextProps.text);
+          this.sendMessage(nextProps.text);
+      }
+      if(!isEmpty(nextProps.sessionId) && nextProps.sessionId!=this.props.sessionId && nextProps.sessionId!='-99'){
+          if(isYZJ()){
+             getLocation((result)=>this.uploadLocation(nextProps.sessionId,result));
+             //this.uploadLocation(nextProps.sessionId,{success:'true',data:{city:'深圳市'}})
+          }
+      }
+    }
     componentDidMount(){
        // alert("sessionid is "+window.chatSessionId);
         const {getMainPageData,uploadLocAPI}=this.props;
@@ -46,11 +70,11 @@ class MainPage extends Component{
         //console.log("result is "+JSON.stringify(result));
         if(result){
            this.hideMainPage();
-           if(!isYZJ()){
+           //if(!isYZJ()){
             //在浏览器非云之家中刷新一次就清除
-               delInLocalStorage('dialog');
-               delInLocalStorage('sessionId');
-           }
+            delInLocalStorage('dialog');
+            delInLocalStorage('sessionId');
+           //}
            this.setState({
               dialogList:result,
            })
@@ -90,23 +114,6 @@ class MainPage extends Component{
        }else{
 
        }
-    }
-    componentWillReceiveProps(nextProps){
-      //接收消息
-      if(nextProps.message!=null){
-          this.acceptMessage(nextProps);
-          //this.transformDialog();
-      }
-      //同音转换发送消息
-      if(!isEmpty(nextProps.text)){
-          this.sendMessage(nextProps.text);
-      }
-      if(!isEmpty(nextProps.sessionId) && nextProps.sessionId!=this.props.sessionId && nextProps.sessionId!='-99'){
-          if(isYZJ()){
-             getLocation((result)=>this.uploadLocation(nextProps.sessionId,result));
-             //this.uploadLocation(nextProps.sessionId,{success:'true',data:{city:'深圳市'}})
-          }
-      }
     }
     handleItemClick=(item)=>{
        const link=item.flink;
@@ -435,6 +442,7 @@ const mapStateToProps=state=>{
       kdIntention:state.mainpage.kdIntention,
       text:state.mainpage.text,
       lastUnfinishedIntention:state.mainpage.lastUnfinishedIntention,
+      exception:state.mainpage.exception,
 	}
 }
 const wrapperFunc=(payload,func,dispatch)=>{
@@ -450,6 +458,7 @@ const mapDispatchToProps=(dispatch)=>{
        tongyinConvertAPI:(payload)=>wrapperFunc(payload,tongyinconvert,dispatch),
        getChatSessionIdAPI:(payload)=>wrapperFunc(payload,getSessionId,dispatch),
        dispatch:dispatch,
+
 
    }
 }

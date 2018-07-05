@@ -1,4 +1,4 @@
-import {getMainPageData,uploadLoc,tongyinConvert,chat,getChatSessionId} from '../services/api';
+import {getMainPageData,uploadLoc,tongyinConvert,chat,getChatSessionId,EXCEPTION} from '../services/api';
 import * as ActionType from './actionType';
 export const changeLoading=flag=>{
 	return ({
@@ -14,6 +14,9 @@ export const fetchMainPageData=(payload)=>{
     //	dispatch(changeLoading(showLoading));
     	try{
             const response=await getMainPageData(payload);
+            if(response.code!='00'){
+              err(dispatch,response['err']);
+            }
             dispatch({
             	type:ActionType.FETCH_MAINPAGE_DATA,
             	payload:response['data'],
@@ -32,13 +35,13 @@ export const fetchMainPageData=(payload)=>{
 }
 */
 export const uploadLocation=(payload)=>{
-    console.log("payload in mainpage is "+JSON.stringify(payload));
+    //console.log("payload in mainpage is "+JSON.stringify(payload));
    return async dispatch=>{
       try{
           const response=await uploadLoc(payload);
           //alert("response is "+JSON.stringify(response))
-          if(response.code=='91'){
-            alert(response.err)
+          if(response.code!='00'){
+            err(dispatch,response['err']);
             return;
           }
           dispatch({
@@ -51,6 +54,12 @@ export const uploadLocation=(payload)=>{
    }
 }
 
+function err(dispatch,err){
+  dispatch({
+     type:ActionType.EXCEPTION,
+     payload:err,
+  })
+}
 /*
 * 同音词转换
 */
@@ -58,7 +67,11 @@ export const tongyinconvert=(payload)=>{
    return async dispatch=>{
       try{
         const response=await tongyinConvert(payload);
-        //console.log("response is "+JSON.stringify(response));
+        //alert("tongyincovert response is "+JSON.stringify(response));
+        if(response['code']!='00'){
+           err(dispatch,response['err']);
+           return;
+        }
         dispatch({
           type:ActionType.TONG_YIN_CONVERT,
           payload:response['text'],
@@ -95,7 +108,11 @@ export const chatDialog=(payload)=>{
    return async dispatch=>{
       try{
         const response=await chat(payload);
-        console.log("response is "+JSON.stringify(response));
+        //alert("chat response is "+JSON.stringify(response));
+        if(response && response.code!='00'){
+            err(dispatch,response['err']);
+            return;
+        }
         dispatch({
           type:ActionType.CHAT,
           payload:{message:JSON.parse(response['message']),kdIntention:JSON.parse(response['kdIntention']),
