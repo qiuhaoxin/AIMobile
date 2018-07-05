@@ -3,6 +3,7 @@ import Styles from './index.less';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+const DIALOG_TITLE="这里是标题";
 class Dialog extends Component{
 	constructor(props){
 		super(props);
@@ -26,7 +27,7 @@ class Dialog extends Component{
     	}
     }
 	render(){
-		const {prefixCls,style,className,title,visible,content}=this.props;
+		const {prefixCls,style,className,title,visible,content,children}=this.props;
 		const wrapperCls=`${prefixCls}-dialog`;
 		const wrapperStyle= style ? Object.assign(style,{
 			display:visible ? 'flex' : 'none',
@@ -34,9 +35,10 @@ class Dialog extends Component{
 			display:visible ? 'flex' : 'none',
 		}
 		return (
-           <div className={`${Styles[wrapperCls]} ${className}`} style={wrapperStyle}>
+          <div className={`${Styles[`${prefixCls}-dialog-wrapper`]}`}>
+            <div className={`${Styles[wrapperCls]} ${className}`} style={wrapperStyle}>
                 <div className={Styles.inner}>
-                   <div className={Styles.header}>
+                   <div className={`${Styles.header} ${title!=DIALOG_TITLE ? Styles['title_fill'] : ''}`}>
                         {title}
                    </div>
                    <div className={Styles.content}>
@@ -44,7 +46,11 @@ class Dialog extends Component{
                    </div>
                    {this.renderFooter()}
                 </div>
-           </div>
+            </div>
+            {
+                children ? children() : null
+            }
+          </div>
 		)
 	}
 }

@@ -4,7 +4,8 @@ let initState={
    appList:[],
    sessionId:"-99",
    message:{},//对话返回结果
-   kdIntention:{},
+   kdIntention:{},//会话当前的 意图及词槽
+   lastUnfinishedIntention:{},
    text:'',//同音转换结果
 }
 

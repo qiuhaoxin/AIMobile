@@ -2,7 +2,7 @@ body,div,ul,li{
 	padding:0;margin:0;
 }
 .dialog{
-	font-size:30px;margin-bottom:73px;
+	font-size:30px;margin-bottom:32px;
 }
 .dialogContent{
 	width:100%;display:inline-flex;
@@ -13,10 +13,16 @@ body,div,ul,li{
 	   justify-content:flex-end;align-items:flex-end;
 	}
 	& .loc{
-	   font-size:32px;color:#333;
+	   font-size:32px;color:#999;margin-top:24px;
+	}
+	& .loc_fill{
+	    color:#333;
 	}
 	& .time{
-	   font-size:26px;color:#999;margin-top:8px;
+	   font-size:26px;color:#999;margin-top:24px;
+	}
+	& .time_fill{
+	   color:#333;
 	}
 }
 .wrapper{
@@ -30,7 +36,7 @@ body,div,ul,li{
 	      padding-left:60px;margin-top:24px;font-size: 32px;color: #2A2A30;line-height: 22px;
 	   }
     & .dialogList{
-       width:100%;position:absolute;left:0;z-index:101;overflow:scroll;top:0;height:1100px;bottom:80px;padding-bottom:234px;
+       width:100%;position:absolute;left:0;z-index:101;overflow:scroll;top:0;height:1100px;bottom:80px;padding-bottom:284px;
        -webkit-overflow-scrolling:touch;
        & .dialog-row{
           width:70%;display:flex;margin-top:72px;font-size:32px;color:#333;line-height:44px;font-family:PingFangSC-Regular;flex-direction:column;
@@ -77,11 +83,6 @@ body,div,ul,li{
                 content:'';position:absolute;border-left:16px solid #fff;border-top:16px solid transparent;border-bottom:16px solid transparent;right:2px;
              }
 	      }
-	      &:last-child{
-	        &:after{
-
-	        }
-	      }
 	   }
 	}
     }
@@ -98,5 +99,11 @@ body,div,ul,li{
 	   & img{
 	      height:72px;margin-left:42px;margin-top:28px;
 	   }
+	}
+}
+.loan{
+	font-family: PingFangSC-Regular;font-size: 28px;color: #999;line-height: 44px;
+	& .color{
+	    color:#4598f0;
 	}
 }

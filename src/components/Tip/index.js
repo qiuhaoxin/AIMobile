@@ -11,8 +11,8 @@ class Tip extends Component{
 
    }
    handleClick=()=>{
-   	  const {onClick}=this.props;
-   	  if(onClick)onClick();
+   	  const {onClick,data}=this.props;
+   	  if(onClick)onClick(data);
    }
    render(){
       const {prefixCls,className,style,icon,tipStr,content,visible}=this.props;
@@ -36,10 +36,12 @@ Tip.defaultProps={
    tipStr:'点击或说出"填写出差申请"即可继续',
    prefixCls:'tip-',
    visible:false,
+   data:{},
 }
 Tip.propTypes={
    tipStr:PropTypes.string,
    prefixCls:PropTypes.string,
    visible:PropTypes.bool,
+   data:PropTypes.object
 }
 export default Tip;

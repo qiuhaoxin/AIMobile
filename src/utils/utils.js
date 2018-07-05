@@ -68,3 +68,35 @@ export const getInLocalStorage=(key)=>{
 }
 
 
+export const getValueFromUrl=(search,keys)=>{
+    const isSearch=/\#|\:/.test(search) ? false :true;
+    let result={},keyValueMappings=[];
+    if(isSearch){
+      //location.search  ?appid=500045674&openId=5ad04e76e4b05c4b7d6245ba&uname=邱浩新
+      search=search.substring(1);
+     // console.log("search is "+search);
+      keyValueMappings=search && search.split('&');
+      //console.log("keyValueMappings is "+keyValueMappings);
+    }else{
+      //location.href
+      let index=search.indexOf('?');
+      search=search.substring(index+1);
+      index=search.indexOf('#');
+      search=index > -1 ? search.split('#')[0] : search;
+      keyValueMappings=search && search.split('&'); 
+    }
+    if(typeof keys=='string' || typeof keys=='number'){
+        keys=Array(keys);
+    }
+
+    keys.forEach(key=>{
+        const res=keyValueMappings.filter(keyValueMapping=>{
+            const keyValue=keyValueMapping.split('=');
+            return keyValue[0]==key;
+        })[0];
+        if(res) result[key]=res.split('=')[1];
+    })
+    return result;
+}
+
+

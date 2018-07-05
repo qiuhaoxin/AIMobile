@@ -8,7 +8,7 @@ export const changeLoading=flag=>{
 }
 //获取小K的配置信息
 export const fetchMainPageData=(payload)=>{
-	console.log("payload is "+JSON.stringify(payload));
+	// console.log("payload is "+JSON.stringify(payload));
     return async dispatch=>{
     	//
     //	dispatch(changeLoading(showLoading));
@@ -36,6 +36,11 @@ export const uploadLocation=(payload)=>{
    return async dispatch=>{
       try{
           const response=await uploadLoc(payload);
+          //alert("response is "+JSON.stringify(response))
+          if(response.code=='91'){
+            alert(response.err)
+            return;
+          }
           dispatch({
             type:ActionType.UPLOAD_LOC,
             payload:response['data'],
@@ -53,7 +58,7 @@ export const tongyinconvert=(payload)=>{
    return async dispatch=>{
       try{
         const response=await tongyinConvert(payload);
-        console.log("response is "+JSON.stringify(response));
+        //console.log("response is "+JSON.stringify(response));
         dispatch({
           type:ActionType.TONG_YIN_CONVERT,
           payload:response['text'],
@@ -65,11 +70,10 @@ export const tongyinconvert=(payload)=>{
 }
 
 export const getSessionId=(payload)=>{
-    console.log("getSessionId payload is "+JSON.stringify(payload));
+   // console.log("getSessionId payload is "+JSON.stringify(payload));
     return async dispatch=>{
       try{
         const response=await getChatSessionId(payload);
-
         dispatch({
           type:ActionType.FETCH_SESSION_ID,
           payload:response['chatSessionID'],
@@ -91,10 +95,11 @@ export const chatDialog=(payload)=>{
    return async dispatch=>{
       try{
         const response=await chat(payload);
-        //console.log("response is "+JSON.stringify(response));
+        console.log("response is "+JSON.stringify(response));
         dispatch({
           type:ActionType.CHAT,
-          payload:{message:JSON.parse(response['message']),kdIntention:JSON.parse(response['kdIntention'])},
+          payload:{message:JSON.parse(response['message']),kdIntention:JSON.parse(response['kdIntention']),
+          lastUnfinishedIntention:response['lastUnfinishedIntention'] && JSON.parse(response['lastUnfinishedIntention'])},
         })
       }catch(e){
 
