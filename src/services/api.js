@@ -57,7 +57,7 @@ export const getChatSessionId=(params)=>{
 
 //对话接口
 export const chat=(params)=>{
-	return request(urlPath + "/chatto",{
+	return request(urlPath + "/chat",{
 		method:'POST',
 		body:params,
 	})

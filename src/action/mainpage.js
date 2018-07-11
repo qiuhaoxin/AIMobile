@@ -108,7 +108,7 @@ export const chatDialog=(payload)=>{
    return async dispatch=>{
       try{
         const response=await chat(payload);
-        //alert("chat response is "+JSON.stringify(response));
+        console.log("chat response is "+JSON.stringify(response));
         if(response && response.code!='00'){
             err(dispatch,response['err']);
             return;

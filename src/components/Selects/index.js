@@ -17,7 +17,7 @@ class Select extends Component{
 		//console.log("dataSource is "+JSON.stringify(dataSource));
 		const itemArr=dataSource.map((item,index)=><li onClick={()=>this.handleItemClick(item,parseInt(index + 1))} className={Styles['select-item']} 
 			key={`${item[itemKey] ? item[itemKey] : parseInt(index + 1)}`}>
-			<span className={Styles.label}>{item[itemKey] ? item[itemKey] : parseInt(index + 1)}.</span><span>{item.value}</span></li>)
+			<span className={Styles.label}>{item[itemKey] ? item[itemKey] : parseInt(index + 1)}:  </span><span>{item.value}</span></li>)
 		return (
 		   <ul className={Styles.list}>
                <li className={Styles.title}>{title}</li>
@@ -44,6 +44,7 @@ Select.propTypes={
    title:PropTypes.string,
    dataSource:PropTypes.array,
    itemKey:PropTypes.oneOfType([PropTypes.number,PropTypes.string]),//数组的组件默认为id
+   onSelectItemClick:PropTypes.func.isRequired,
 }
 Select.defaultProps={
    prefixCls:'ai-select-',
@@ -51,6 +52,7 @@ Select.defaultProps={
    title:'请选择:',
    dataSource:[],
    itemKey:'id',
+   onSelectItemClick:null,
 }
 
 export default Select;

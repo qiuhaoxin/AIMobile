@@ -5,7 +5,7 @@ import className from 'classnames';
 import Styles from './index.less';
 import {connect} from 'react-redux';
 import {fetchMainPageData,uploadLocation,chatDialog,tongyinconvert,getSessionId} from '../../action/mainpage';
-import {isYZJ,getNetWorkType,getLocation,speak,getYZJLang,getOS,backYZJ,playVoice,stopPlayVoice} from '../../utils/yzj';
+import {isYZJ,getNetWorkType,getLocation,speak,getYZJLang,getOS,backYZJ,playVoice,stopPlayVoice,startSpeech,stopSpeech} from '../../utils/yzj';
 import {isEmpty,FilterMaxId,saveInLocalStorage,getInLocalStorage,delInLocalStorage,getValueFromUrl} from '../../utils/utils';
 import {FETCH_SESSION_ID} from  '../../action/actionType/';
 import Dialog from '../../components/Dialog'; 
@@ -14,11 +14,17 @@ import Select from '../../components/Selects';
 
 import robotMic from '../../images/robot_mic.png';
 import logo from '../../images/logo.gif';
+import SiriWave from '../../lib/SiriWave';
 
 const HELP_TITLE='请问需要什么帮助？';
 const HELP_TITLE_TWO='你可以这样问我';
 const DIALOG_TITLE="这里是标题";
+const TIME_TO_SCROLL=150;
+const TIME_TO_HIDE=150;
 const SOURCE_ADDRESS="出发地",TARGET_ADDRESS='目的地',BEGIN_TIME="出发时间",BACK_TIME='返回时间';
+const urlMapping={
+  'BUS_TRIP':'renderExtendBus_tip'
+}
 
 class MainPage extends Component{
   	constructor(props){
@@ -28,6 +34,7 @@ class MainPage extends Component{
     state={
       dialogList:[],
       showTip:false,//控制顶部Tip可见性
+      precent:0,
     }
     componentWillMount(){
        if(isYZJ()){
@@ -61,6 +68,7 @@ class MainPage extends Component{
           }
       }
     }
+
     componentDidMount(){
        // alert("sessionid is "+window.chatSessionId);
         const {getMainPageData,uploadLocAPI}=this.props;
@@ -70,6 +78,7 @@ class MainPage extends Component{
         //console.log("result is "+JSON.stringify(result));
         if(result){
            this.hideMainPage();
+           this.showDialogList();
            //if(!isYZJ()){
             //在浏览器非云之家中刷新一次就清除
             delInLocalStorage('dialog');
@@ -83,6 +92,21 @@ class MainPage extends Component{
           const result= getValueFromUrl(!isEmpty(location.search) ? location.search : location.href,['appid','openId']);
           getMainPageData(true,{appid:(result && result['appid']) || ''});
         }
+
+        this.siriWave = new SiriWave({
+          container: this.ele,
+          width: 222,
+          height: 30,
+          speed: 0.01,
+          amplitude: .6,
+          autostart: true,
+          style: 'ios9'
+          /*
+          speed: 0.2,
+          color: '#000',
+          frequency: 2
+          */
+      });
     }
     componentWillUnmount(){
         delInLocalStorage('dialog');
@@ -90,6 +114,7 @@ class MainPage extends Component{
     }
     getSessionIdFirst=()=>{
        const {getChatSessionIdAPI,dispatch}=this.props;
+       //alert("sessionId is Localstorage is "+getInLocalStorage('sessionId')+" and window chatSessionId is "+window.chatSessionId);
        const sessionId=getInLocalStorage('sessionId') || window.chatSessionId || '';
        if(sessionId){
          dispatch({
@@ -98,10 +123,11 @@ class MainPage extends Component{
          })
        }else{
          //const {appid,openId,uname}=this.props.match.params;
-         const uname='邱浩新';
-         const appid='500045674';
-         const openId='5ad04e76e4b05c4b7d6245ba';
-         getChatSessionIdAPI({appid,openId,uname})
+         // const uname='邱浩新';
+         // const appid='500045674';
+         // const openId='5ad04e76e4b05c4b7d6245ba';
+        const result= getValueFromUrl(!isEmpty(location.search) ? location.search : location.href,['appid','openId','uname']);
+         getChatSessionIdAPI({appid:result['appid'],openId:result['openId'],uname:result['uname']})
        }
 
     }
@@ -116,6 +142,7 @@ class MainPage extends Component{
        }
     }
     handleItemClick=(item)=>{
+      console.log("item si "+JSON.stringify(item));
        const link=item.flink;
        if(link){
        	  location.href=link;
@@ -128,7 +155,12 @@ class MainPage extends Component{
              _this.localId=0;
           })
         }
-        speak(this.handleSpeak);
+       // speak(this.handleSpeak);
+       // startSpeech((precent)=>{
+       //    _this.setState({
+       //      precent
+       //    })
+       // });
     }
     handleSpeak=(result)=>{
        let text="";
@@ -146,12 +178,14 @@ class MainPage extends Component{
       const {tongyinConvertAPI,sessionId}=this.props;
       if(this.ContentTip && this.ContentTip.style.display!='none'){
         this.hideMainPage();
+        this.showDialogList();
       }
       tongyinConvertAPI({sessionId,text})
     }
+    //
+    renderExtendBus_tip=()=><div className={Styles.loan}>如果有需要<span className={Styles.color}>“借款”</span>请告诉我</div>
     renderAppList=()=>{
     	const {appList}=this.props;
-        
     	return (
             <ul className={Styles.appList}>
                 {
@@ -171,6 +205,7 @@ class MainPage extends Component{
     }
     //渲染对话框
     renderDialog=(item)=>{
+      //   {item.render ? item.render :null}
         const {kdIntention,type}=item;
         if(kdIntention!=null && kdIntention['intention'] && kdIntention['intention'].toUpperCase()=='BUS_TRIP'){
            const wordslot=kdIntention.kdWordslots;
@@ -178,12 +213,13 @@ class MainPage extends Component{
            reason=reason && reason['originalWord'];
            return <Dialog title={reason ? reason : DIALOG_TITLE} className={Styles.dialog} content={()=>this.handleDialogContent(kdIntention['kdWordslots'])} 
            onSubmit={item.type=='URL' ? ()=>this.handleDialogSubmit(item) : null} onEdit={item.type=='URL' ? ()=>this.handleDialogEdit(item) : null}>
-               {item.render ? item.render :null}
+               {item.type=='URL' ? this[urlMapping[kdIntention['intention']]] : null}
            </Dialog>
         } 
     }
     handleSelectItemClick=(item,key)=>{
-       //console.log("key is "+key+" and itme is "+JSON.stringify(item));
+       const text=key+": "+item.value;
+       this.sendMessage(text);
     }
     renderSelect=(item)=>{
        const {data,text,title}=item;
@@ -213,7 +249,7 @@ class MainPage extends Component{
               </li>
          })
          return (
-            <ul className={Styles.dialogList} ref={el=>this.DialogList=el}>
+            <ul className={Styles.dialogList} style={{display:'none'}} ref={el=>this.DialogList=el}>
               <li style={{height:'58px',display:this.state.showTip ? 'flex' : 'none'}}>
 
               </li>
@@ -230,28 +266,35 @@ class MainPage extends Component{
            this.ContentTip.style['transition']='transform .15s ease-in-out';
            setTimeout(function(){
               _this.ContentTip.style['display']="none";
-           },150)
+           },TIME_TO_HIDE)
         }
+
     }
-    //发送消息
-    sendMessage=(text)=>{
+    //发送消息 @params text:发送消息的文本string   showInList:是否显示在对话列表上bool
+    sendMessage=(text,showInList=true)=>{
       let dialog=this.state.dialogList; 
       const {sessionId,chatAPI}=this.props;
-      const id=FilterMaxId(dialog,'id');
-      dialog.push({className:'user-dialog',text,id});
-      this.setState({
-            dialogList:dialog,
-      },()=>{
+      if(showInList){
+        const id=FilterMaxId(dialog,'id');
+        dialog.push({className:'user-dialog',text,id});
+        this.setState({
+              dialogList:dialog,
+        },()=>{
+          chatAPI({sessionId,message:text});
+        })
+      }else{
+        //不显示发送文本
         chatAPI({sessionId,message:text});
-      })
+      }
     }
     transformDialog=()=>{
       const _this=this;
       if(this.DialogList){
-          const sro=parseInt(_this.DialogList.scrollHeight) + parseInt(_this.DialogList.offsetHeight) + 1000;
+          const sro=parseInt(_this.DialogList.scrollHeight) + parseInt(_this.DialogList.offsetHeight) + 10000;
           setTimeout(function(){
             ReactDOM.findDOMNode(_this.DialogList).scrollTop=sro;
-          },150)
+            console.log("scrollTop is "+_this.DialogList.scrollTop);
+          },TIME_TO_SCROLL)
       }
     }
     getReason=(kdWordslots,key)=>{
@@ -267,10 +310,14 @@ class MainPage extends Component{
 
         if(intention=='BUS_TRIP'){
           const reason=this.getReason(kdWordslots,'user_reason');
-          this.tipContent= reason ? reason : '未完成的'+intentionName;
+          this.tipContent= (reason ? reason : '未完成的')+intentionName;
           //出差申请
           this.setState({
               showTip:true,
+          })
+        }else{
+          this.setState({
+            showTip:false,
           })
         }
     }
@@ -305,8 +352,7 @@ class MainPage extends Component{
            break;
            case 'URL':
                let text1='';
-               dialog.push({className:'chatbot-dialog',text:text1,id:FilterMaxId(dialog,'id'),kdIntention,type,url:message.url,
-               render:()=><div className={Styles.loan}>如果有需要<span className={Styles.color}>“借款”</span>请告诉我</div>});
+               dialog.push({className:'chatbot-dialog',text:text1,id:FilterMaxId(dialog,'id'),kdIntention,type,url:message.url});
                this.setState({
                   dialogList:dialog,
                })
@@ -319,6 +365,11 @@ class MainPage extends Component{
            break;
         }
     }
+    showDialogList=()=>{
+       if(this.DialogList && this.DialogList.style['display']=='none'){
+           this.DialogList.style['display']='block';
+       }
+    }
     handleKeyup=(e)=>{
         const _this=this;
         const {tongyinConvertAPI,sessionId,chatAPI}=this.props;
@@ -329,6 +380,7 @@ class MainPage extends Component{
           if(isEmpty(value))return;
           if(this.ContentTip && this.ContentTip.style.display!='none'){
               this.hideMainPage();
+              this.showDialogList();
           }
           e.target.value="";
           tongyinConvertAPI({text:value,sessionId});
@@ -361,10 +413,10 @@ class MainPage extends Component{
        const number=item.number;
        switch(number){
          case 'user_e_l':
-             e_loc=item['originalWord']+'  (目的地)';
+             e_loc=item['originalWord']+'  ('+TARGET_ADDRESS+')';
          break;
          case 'user_b_l':
-             b_loc=item['originalWord']+'  (出发地)';
+             b_loc=item['originalWord']+'  ('+SOURCE_ADDRESS+')';
          break;
          case 'user_b_t':
              b_t=item['normalizedWord'];
@@ -389,21 +441,25 @@ class MainPage extends Component{
   }
   handleTipClick=(data)=>{
       const _this=this;
-      console.log("data is "+JSON.stringify(data));
+      //console.log("data is "+JSON.stringify(data));
       const {intention,kdWordslots,say}=data;
-      let dialog=this.state.dialogList;
-      if(intention=='BUS_TRIP'){
-        if(isYZJ()){
-          playVoice(say,(localId)=>{
-             _this.localId=localId;
-          })
-        }
-        dialog.push({className:'chatbot-dialog',text:say,id:FilterMaxId(dialog,'id'),kdIntention:{intention,kdWordslots},type:'TEXT'});
-        this.setState({
-          dialogList:dialog,
-          showTip:false,
-        })
-      }
+      // let dialog=this.state.dialogList;
+      // if(intention=='BUS_TRIP'){
+      //   if(isYZJ()){
+      //     playVoice(say,(localId)=>{
+      //        _this.localId=localId;
+      //     })
+      //   }
+      //   dialog.push({className:'chatbot-dialog',text:say,id:FilterMaxId(dialog,'id'),kdIntention:{intention,kdWordslots},type:'TEXT'});
+      //   this.setState({
+      //     dialogList:dialog,
+      //     showTip:false,
+      //   })
+      // }
+      this.setState({
+        showTip:false,
+      })
+      this.sendMessage('填写出差申请',false);
   }
 	render(){
 		const {title,sessionId,appList,lastUnfinishedIntention}=this.props;
@@ -414,7 +470,6 @@ class MainPage extends Component{
                  <div className={Styles.contentTip} ref={el=>this.ContentTip=el}>
                    <div className={Styles.rowTitle}>{title}</div>
                    <div className={Styles.row}>{HELP_TITLE}</div>
-                   <div className={Styles.row}>{HELP_TITLE_TWO}</div>
                    {this.renderAppList()}
                  </div>
                   <Tip className={Styles.Tip} content={this.tipContent} data={lastUnfinishedIntention} onClick={this.handleTipClick} 
@@ -422,11 +477,13 @@ class MainPage extends Component{
                  {this.renderDialogList()}
                  {this.transformDialog()}
              </div>
-             <div className={Styles.footer}>
+
+             <div className={Styles.footer} ref={el=>this.ele=el}>
                  {
-                    isYZJ() ? <div className={Styles.ball} onClick={this.handleClickBall}>
-                     <img src={robotMic} />
-                    </div> : <input placeholder="输入" onKeyUp={this.handleKeyup} />
+
+                    // isYZJ() ? <div className={Styles.ball} onClick={this.handleClickBall}>
+                    //  <img src={robotMic} />
+                    // </div> : <input placeholder="输入" onKeyUp={this.handleKeyup} />
                  }
              </div>
           </div>
@@ -470,5 +527,8 @@ export default connect(mapStateToProps,mapDispatchToProps)(MainPage);
                  // </div>
      <input placeholder="输入" onKeyUp={this.handleKeyup}/>
                                  <Tip className={Styles.Tip} content={'北京客户大会出差申请'}/>
+
+
+                                              <div><input value={this.state.precent}/></div>
 */
 
