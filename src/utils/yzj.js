@@ -47,7 +47,11 @@ export const getNetWorkType=(fn)=>{
 
 export const getLocation=(fn)=>{
    XuntongJSBridge.call('getLocation',{},function(result){
-   	  if(fn)fn(result);
+   	  if(String(result.success)=='true'){
+        if(fn)fn(result);
+      }else{
+        alert("getLocation is "+result.error);
+      }
    });
 }
 
@@ -125,7 +129,11 @@ export const speak=(fn)=>{
 	 XuntongJSBridge.call('voiceRecognize',{
 
      },function(result){
-        fn && fn(result);
+        if(String(result.success)=='true'){
+          fn && fn(result); 
+        }else{
+          alert("speak error is "+result.error);
+        }
     })
 }
 
@@ -157,6 +165,8 @@ export const playVoice=(msgContent,fn)=>{
                 function(result) {
                 fn && fn(localId,result);
             });
+      }else{
+        alert("playVoice error is "+result.error);
       }
     })
 }
@@ -178,41 +188,21 @@ export const backYZJ=(fn)=>{
 */
 export const startSpeech=(fn)=>{
     XuntongJSBridge.call('startSpeechRecognize',{},function(result){
-        if(String(result.success)=='true'){
-           const data=result.data;
-           const status=data.status;
-           switch(status){
-              case 1://录音开始
-
-              break;
-              case 2://录音结束
-                 //alert("结束录音");
-              break;
-              case 3://音量变化
-                 const percent=data.percent;
-                 fn && fn(percent);
-              break;
-              case 4://识别出错
-                  const errorCode=data.errorCode; //只能是1
-                  const errorMessage=data.errorMessage;
-
-              break;
-              case 5://识别结果
-                  const result=data.result;
-                  const isLast=data.isLast;//语音识别是否结束
-                  //alert("result is "+result);
-              break;
-           }
+      if(String(result.success)=='true'){
+            fn && fn(result); 
         }else{
-           //alert("errorMessage is "+result.error+" and error code is "+result.errorCode);
+           alert("errorMessage is "+result.error+" and error code is "+result.errorCode);
         }
     })
 }
 
+//停止录音接口
 export const stopSpeech=(fn)=>{
    XuntongJSBridge.call('stopSpeechRecognize',{},function(result){
        if(String(result.success)=='true'){
-      
+           fn && fn(result);
+       }else{
+          alert("stopSpeech error is "+result.error);
        }
    })
 }

@@ -34,7 +34,7 @@ class MainPage extends Component{
     state={
       dialogList:[],
       showTip:false,//控制顶部Tip可见性
-      precent:0,
+      percent:0,
     }
     componentWillMount(){
        if(isYZJ()){
@@ -70,6 +70,7 @@ class MainPage extends Component{
     }
 
     componentDidMount(){
+      const _this=this;
        // alert("sessionid is "+window.chatSessionId);
         const {getMainPageData,uploadLocAPI}=this.props;
 
@@ -93,24 +94,53 @@ class MainPage extends Component{
           getMainPageData(true,{appid:(result && result['appid']) || ''});
         }
 
-        this.siriWave = new SiriWave({
-          container: this.ele,
-          width: 222,
-          height: 30,
-          speed: 0.01,
-          amplitude: .6,
-          autostart: true,
-          style: 'ios9'
-          /*
-          speed: 0.2,
-          color: '#000',
-          frequency: 2
-          */
-      });
+        // this.siriWave = new SiriWave({
+        //     container: this.Wave,
+        //     width: 222,
+        //     height: 30,
+        //     speed: 0.04,
+        //     amplitude: 1.2,
+        //     autostart: true,
+        //     style: 'ios9',
+        //     /*
+        //     speed: 0.2,
+        //     color: '#000',
+        //     frequency: 2
+        //     */
+        // });
     }
     componentWillUnmount(){
         delInLocalStorage('dialog');
         delInLocalStorage('sessionId');
+    }
+    //SpeakIconStyle 图标样式,WaveStyle 声波图样式   
+    changeSpeakStyle=(SpeakIconStyle='block',WaveStyle='none')=>{
+      if(SpeakIconStyle==WaveStyle){
+        console.warn("两个的样式不能一致!");
+        return;
+      }
+      if(this.SpeakIcon){
+        this.SpeakIcon.style['display']=SpeakIconStyle;
+      }
+      if(this.Wave){
+        this.Wave.style['display']=WaveStyle;
+      }
+      if(!this.siriWave){
+        this.siriWave = new SiriWave({
+            container: this.Wave,
+            width: 222,
+            height: 30,
+            speed: 0.01,
+            amplitude: 1.2,
+            autostart: true,
+            style: 'ios9'
+            /*
+            speed: 0.2,
+            color: '#000',
+            frequency: 2
+            */
+        });
+      }
     }
     getSessionIdFirst=()=>{
        const {getChatSessionIdAPI,dispatch}=this.props;
@@ -122,10 +152,6 @@ class MainPage extends Component{
             payload:sessionId,
          })
        }else{
-         //const {appid,openId,uname}=this.props.match.params;
-         // const uname='邱浩新';
-         // const appid='500045674';
-         // const openId='5ad04e76e4b05c4b7d6245ba';
         const result= getValueFromUrl(!isEmpty(location.search) ? location.search : location.href,['appid','openId','uname']);
          getChatSessionIdAPI({appid:result['appid'],openId:result['openId'],uname:result['uname']})
        }
@@ -135,7 +161,6 @@ class MainPage extends Component{
        const {uploadLocAPI}=this.props;
        if(result && String(result['success'])=='true'){
           const loc=result['data']['city'];
-          //alert("sessionId uploadLoc is "+sessionId+" and locStr is "+loc);
           uploadLocAPI(true,{sessionId,locStr:loc});
        }else{
 
@@ -150,18 +175,62 @@ class MainPage extends Component{
     }
     handleClickBall=()=>{
         const _this=this;
+
         if(this.localId){
           stopPlayVoice(this.localId,()=>{
              _this.localId=0;
           })
         }
-       // speak(this.handleSpeak);
-       // startSpeech((precent)=>{
-       //    _this.setState({
-       //      precent
-       //    })
-       // });
+        //隐藏图片按钮，显示声波图
+        this.changeSpeakStyle('none','block');
+        //speak(this.handleSpeak);
+       startSpeech((result)=>{
+           const data=result.data;
+           const status=data.status;
+           switch(status){
+              case 1://录音开始
+
+              break;
+              case 2://录音结束
+                 //alert("结束录音");
+                 this.changeSpeakStyle('block','none');
+              break;
+              case 3://音量变化
+                 const percent=data.percent;
+                 //fn && fn(percent);
+                 // this.setState({
+                 //    percent
+                 // })
+                 //_this.siriWave.setAmplitude(percent * 30);
+                  if(_this.siriWave){
+                    _this.timeoutId=setTimeout(function(){ 
+                       if(_this.timeoutId){
+                          clearTimeout(_this.timeoutId);
+                          _this.timeoutId=0;
+                       }
+                       let rand=percent * 0.6;
+                       //rand=parseFloat()
+                       //rand=rand.toFixed(3);
+                       //console.log("random is "+rand);
+                       _this.siriWave.setSpeed(rand);
+                    },100)
+                  }
+              break;
+              case 4://识别出错
+                  const errorCode=data.errorCode; //只能是1
+                  const errorMessage=data.errorMessage;
+
+              break;
+              case 5://识别结果
+                  const result=data.result;
+                  const isLast=data.isLast;//语音识别是否结束
+                  const tempResult={success:'true',data:{text:result}};
+                  this.handleSpeak(tempResult);
+              break;
+           }
+       });
     }
+    //
     handleSpeak=(result)=>{
        let text="";
        if(result && String(result['success'])=='true'){
@@ -254,6 +323,7 @@ class MainPage extends Component{
 
               </li>
               {dialogContent}
+              <li style={{height:'234px',background:'#fff'}}></li>
             </ul>
          )
     }
@@ -332,7 +402,8 @@ class MainPage extends Component{
         if(lastUnfinishedIntention){
             this.dealTip(lastUnfinishedIntention);
         }
-        if(isYZJ()){
+        stopSpeech(()=>this.changeSpeakStyle('display','none'));
+        if(isYZJ() && message.text && !isEmpty(message.text)){
           playVoice(message.text,(localId)=>{
              _this.localId=localId;
           })
@@ -441,21 +512,7 @@ class MainPage extends Component{
   }
   handleTipClick=(data)=>{
       const _this=this;
-      //console.log("data is "+JSON.stringify(data));
       const {intention,kdWordslots,say}=data;
-      // let dialog=this.state.dialogList;
-      // if(intention=='BUS_TRIP'){
-      //   if(isYZJ()){
-      //     playVoice(say,(localId)=>{
-      //        _this.localId=localId;
-      //     })
-      //   }
-      //   dialog.push({className:'chatbot-dialog',text:say,id:FilterMaxId(dialog,'id'),kdIntention:{intention,kdWordslots},type:'TEXT'});
-      //   this.setState({
-      //     dialogList:dialog,
-      //     showTip:false,
-      //   })
-      // }
       this.setState({
         showTip:false,
       })
@@ -478,13 +535,17 @@ class MainPage extends Component{
                  {this.transformDialog()}
              </div>
 
-             <div className={Styles.footer} ref={el=>this.ele=el}>
+             <div className={Styles.footer}>
+                <div ref={el=>this.SpeakIcon=el} style={{display:'display'}}>
                  {
-
-                    // isYZJ() ? <div className={Styles.ball} onClick={this.handleClickBall}>
-                    //  <img src={robotMic} />
-                    // </div> : <input placeholder="输入" onKeyUp={this.handleKeyup} />
+                     isYZJ() ? <div className={Styles.ball} onClick={this.handleClickBall}>
+                     <img src={robotMic} />
+                     </div> : <input placeholder="输入" onKeyUp={this.handleKeyup} />
                  }
+                </div>
+                <div ref={el=>this.Wave=el} style={{display:'none'}}>
+  
+                </div>
              </div>
           </div>
 		)
@@ -527,7 +588,7 @@ export default connect(mapStateToProps,mapDispatchToProps)(MainPage);
                  // </div>
      <input placeholder="输入" onKeyUp={this.handleKeyup}/>
                                  <Tip className={Styles.Tip} content={'北京客户大会出差申请'}/>
-
+                <div><input value={this.state.percent} style={{'paddingLeft':'30px'}}/></div>
 
                                               <div><input value={this.state.precent}/></div>
 */
