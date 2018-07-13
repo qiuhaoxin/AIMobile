@@ -68,9 +68,7 @@ SiriWave9Curve.prototype.definition = [
 { color: '94,252,169' },
 { color: '253,71,103' }
 ];
-
 // Standard Curve
-
 function SiriWaveCurve(opt) {
 	this.controller = opt.controller;
 	this.definition = opt.definition;

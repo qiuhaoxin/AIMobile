@@ -15,6 +15,7 @@ import Select from '../../components/Selects';
 import robotMic from '../../images/robot_mic.png';
 import logo from '../../images/logo.gif';
 import SiriWave from '../../lib/SiriWave';
+import xiaok from '../../images/xiaok.png';
 
 const HELP_TITLE='请问需要什么帮助？';
 const HELP_TITLE_TWO='你可以这样问我';
@@ -30,6 +31,7 @@ class MainPage extends Component{
   	constructor(props){
   		super(props);
       this.tipContent="";
+      this.imgPath=REQUESTURL && REQUESTURL=='prod' ? '../static/Icon/' : 'http://172.20.71.86:8888/rest/static/Icon/';
   	}
     state={
       dialogList:[],
@@ -94,20 +96,20 @@ class MainPage extends Component{
           getMainPageData(true,{appid:(result && result['appid']) || ''});
         }
 
-        // this.siriWave = new SiriWave({
-        //     container: this.Wave,
-        //     width: 222,
-        //     height: 30,
-        //     speed: 0.04,
-        //     amplitude: 1.2,
-        //     autostart: true,
-        //     style: 'ios9',
-        //     /*
-        //     speed: 0.2,
-        //     color: '#000',
-        //     frequency: 2
-        //     */
-        // });
+        this.siriWave = new SiriWave({
+            container: this.Wave,
+            width: 222,
+            height: 30,
+            speed: 0.04,
+            amplitude: 1.2,
+            autostart: true,
+            style: 'ios9',
+            /*
+            speed: 0.2,
+            color: '#000',
+            frequency: 2
+            */
+        });
     }
     componentWillUnmount(){
         delInLocalStorage('dialog');
@@ -260,7 +262,7 @@ class MainPage extends Component{
                 {
                 	appList.map(item=><li key={item.fid} onClick={()=>this.handleItemClick(item)}>
                 		<div className={Styles.iconPath}>
-                        <img src={`http://172.20.71.86:8888/rest/static/Icon/${item.ficonpath}`} />
+                        <img src={`${this.imgPath}${item.ficonpath}`} />
                     </div>
                 		<div className={Styles.content}>
                 		    <span className={Styles.title}>{item.ftitle}</span>
@@ -323,7 +325,6 @@ class MainPage extends Component{
 
               </li>
               {dialogContent}
-              <li style={{height:'234px',background:'#fff'}}></li>
             </ul>
          )
     }
@@ -536,14 +537,16 @@ class MainPage extends Component{
              </div>
 
              <div className={Styles.footer}>
-                <div ref={el=>this.SpeakIcon=el} style={{display:'display'}}>
+                <div ref={el=>this.SpeakIcon=el} style={{display:'none'}}>
                  {
-                     isYZJ() ? <div className={Styles.ball} onClick={this.handleClickBall}>
-                     <img src={robotMic} />
-                     </div> : <input placeholder="输入" onKeyUp={this.handleKeyup} />
+                     isYZJ() ? 
+                     <div className={Styles.ball} onClick={this.handleClickBall}>
+                        <img src={xiaok} />
+                     </div> 
+                     : <input placeholder="输入" onKeyUp={this.handleKeyup} />
                  }
                 </div>
-                <div ref={el=>this.Wave=el} style={{display:'none'}}>
+                <div ref={el=>this.Wave=el} style={{display:'block'}}>
   
                 </div>
              </div>
