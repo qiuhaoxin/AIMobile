@@ -3,14 +3,14 @@ require('isomorphic-fetch');
 import request from './request.js';
 
 const urlObj={
-	'test':'http://172.20.71.86:8888/rest/chatbot',
+	'test':'http://172.20.70.42:8888/rest/chatbot',
 	'prod':'./',
 }
 
 //172.20.71.86
 //const urlPath="http://192.168.206.72/LightApp/data/";
 //const urlPath="./";
-let urlPath="http://172.20.71.86:8888/rest/chatbot";
+let urlPath="http://172.20.71.42:8888/rest/chatbot";
 
 if(REQUESTURL){
 	console.log("REQUESTURL is "+REQUESTURL);
@@ -63,3 +63,11 @@ export const chat=(params)=>{
 	})
 }
 
+
+//上传日志 埋点前端监控
+export const uploadLog=(params)=>{
+	return request(urlPath + "/uplodaMobileLog",{
+		method:'POST',
+		body:params,
+	})
+}

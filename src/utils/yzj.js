@@ -1,8 +1,19 @@
 /*
 * 云之家接口
 */
-import {isEmpty} from './utils';
+import {isEmpty,uploadError} from './utils';
 
+function createParams(functionName,desc,duration=0){
+  duration=parseFloat(duration).toFixed(2);
+  return {
+    FApp:'chatbot',
+    FSessionId:window.chatSessionId,
+    FTeminal:'Mobile',
+    FFunction:"yzj api "+functionName,
+    FDesc:desc,
+    FDuration:duration,
+  }
+}
 //是否运行在云之家
 export const isYZJ=()=>{
 	//alert(navigator.userAgent)
@@ -50,7 +61,8 @@ export const getLocation=(fn)=>{
    	  if(String(result.success)=='true'){
         if(fn)fn(result);
       }else{
-        alert("getLocation is "+result.error);
+        //alert("getLocation is "+result.error);
+        uploadError(createParams('getLocation',result.error,0))
       }
    });
 }
@@ -110,7 +122,11 @@ export const scanQRCode=(fn)=>{
 	XuntongJSBridge.call("scanQRCode",  {
        "needResult":0
        }, function(result) {
-         fn && fn(result);
+         if(String(result.success)=='true'){
+            fn && fn(result);
+         }else{
+             uploadError(createParams('scanQRCode',result.error,0));
+         }
     });
 }
 
@@ -143,7 +159,11 @@ export const speak=(fn)=>{
 export const stopPlayVoice=(localId,fn)=>{
    XuntongJSBridge.call('stopVoice', {localId:localId},
       function(result){
-        fn && fn(result);
+        if(String(result.success)=='true'){
+          fn && fn(result);
+        }else{
+          uploadError(createParams('stopPlayVoice',result.error,0));
+        }
       }
   );
 }
@@ -166,7 +186,8 @@ export const playVoice=(msgContent,fn)=>{
                 fn && fn(localId,result);
             });
       }else{
-        alert("playVoice error is "+result.error);
+        //alert("playVoice error is "+result.error);
+         uploadError(createParams('playVoice',result.error,0));
       }
     })
 }
@@ -192,6 +213,7 @@ export const startSpeech=(fn)=>{
             fn && fn(result); 
         }else{
            alert("errorMessage is "+result.error+" and error code is "+result.errorCode);
+           uploadError(createParams('startSpeech',result.error,0));
         }
     })
 }
@@ -202,7 +224,9 @@ export const stopSpeech=(fn)=>{
        if(String(result.success)=='true'){
            fn && fn(result);
        }else{
-          alert("stopSpeech error is "+result.error);
+          //alert("stopSpeech error is "+result.error);
+          fn && fn(result.errorCode,result.error);
+          uploadError(createParams('stopSpeech',result.error,0));
        }
    })
 }

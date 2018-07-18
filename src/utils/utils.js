@@ -1,4 +1,4 @@
-
+import {uploadLog}  from '../services/api';
 /*
 * 判断字符串是否为空
 * @Param str 目标字符串
@@ -97,6 +97,18 @@ export const getValueFromUrl=(search,keys)=>{
         if(res) result[key]=res.split('=')[1];
     })
     return result;
+}
+
+//上传报错
+export const uploadError=async (params)=>{
+    const response=await uploadLog(params);
+}
+
+//过滤特殊字符
+export const trimSpecial=(text)=>{
+    if(isEmpty(test))return;
+    text=text.replace(/[\ |\~|\，|\。|\`|\!|\！|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\？]/g,""); 
+    return text;
 }
 
 

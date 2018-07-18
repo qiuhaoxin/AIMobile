@@ -64,11 +64,13 @@ SiriWave9Curve.prototype.draw = function() {
 };
 
 SiriWave9Curve.prototype.definition = [
-{ color: '32,133,252' },
-{ color: '94,252,169' },
-{ color: '253,71,103' }
+{ color: '208,141,255' },
+{ color: '130,158,255' },
+{ color: '127,234,255' }
 ];
+
 // Standard Curve
+
 function SiriWaveCurve(opt) {
 	this.controller = opt.controller;
 	this.definition = opt.definition;
@@ -146,6 +148,8 @@ export default function SiriWave(opt) {
 	this.cache.width2 = this.cache.width / 2;
 	this.cache.width4 = this.cache.width / 4;
 	this.cache.heightMax = (this.cache.height2) - 4;
+	this.clickCB=opt.clickCB;
+	//console.log("clickCB is "+this.clickCB);
 
 	// Constructor opt
 
@@ -167,6 +171,7 @@ export default function SiriWave(opt) {
 	// Canvas
 
 	this.canvas = document.createElement('canvas');
+	this.container.addEventListener('touchstart',this._touchStart.bind(this),false);
 	this.ctx = this.canvas.getContext('2d');
 	this.canvas.width = this.cache.width;
 	this.canvas.height = this.cache.height;
@@ -204,6 +209,15 @@ export default function SiriWave(opt) {
 	if (opt.autostart) {
 		this.start();
 	}
+}
+
+SiriWave.prototype._touchStart=function(e){
+    //console.log("sdfsd");
+    //console.log("clickCB is "+this.clickCB);
+    this.clickCB && this.clickCB();
+}
+SiriWave.prototype._touchEnd=function(e){
+
 }
 
 SiriWave.prototype._hex2rgb = function(hex){
