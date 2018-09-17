@@ -1,19 +1,16 @@
 import 'babel-polyfill';
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
-//import {createStore,applyMiddleware} from 'redux';
-import createSagaMiddleware from 'redux-saga';
+//import createSagaMiddleware from 'redux-saga';
 import {Provider} from 'react-redux';
-import {createStore,applyMiddleware} from 'redux';
+//import {createStore,applyMiddleware} from 'redux';
 import Router from './routes';
 import reducers  from './reducers';
-//import thunk from 'redux-thunk';
-import RootSaga from './saga';
-
-const sagaMiddleware=createSagaMiddleware(RootSaga);
-const store=createStore(reducers,applyMiddleware(sagaMiddleware));
+//import RootSaga from './saga';
+//const sagaMiddleware=createSagaMiddleware(RootSaga);
+//const store=createStore(reducers,applyMiddleware(sagaMiddleware));
 //sagaMiddleware.run(RootSaga);
-
+import store from './configStore';
 
 function render(MyCompnent){
 	return ReactDOM.render(

@@ -3,7 +3,7 @@ require('isomorphic-fetch');
 import request from './request.js';
 
 const urlObj={
-	'test':'http://172.20.70.42:8888/rest/chatbot',
+	'test':'https://ai.kingdee.com:9992/aitest/chatbot',//172.20.70.42:8888
 	'prod':'./',
 }
 
