@@ -13,12 +13,14 @@ let initState={
 
 const mainpage=(state=initState,action)=>{
      switch(action.type){
-        case ActionType.FETCH_MAINPAGE_DATA:
+        case ActionType.DEAL_MAINPAGE_DATA:
+            console.log("action payload is "+JSON.stringify(action.payload));
             return {
             	...state,
-                ...action.payload,
+              ...action.payload,
             }
         break;
+
         case ActionType.TONG_YIN_CONVERT:
             return {
               ...state,
