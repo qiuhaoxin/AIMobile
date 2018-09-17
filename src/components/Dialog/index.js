@@ -12,8 +12,7 @@ class Dialog extends Component{
     	const {footer,onEdit,onSubmit,onEditStr,onSubmitStr}=this.props;
     	if(!footer){
     		if(onEdit && !onSubmit){
-
-               return (<div className={Styles.footer}><div>{onEditStr}</div></div>);
+            return (<div className={Styles.footer}><div>{onEditStr}</div></div>)
     		}else if(onEdit && onSubmit){
     		   const style={width:'50%',boxSizing:'border-box'};
                return (<div className={Styles.footer}><div className={Styles.left} style={style} onClick={onEdit}>{onEditStr}</div><div className={Styles.right} onClick={onSubmit} style={style}>{onSubmitStr}</div></div>)

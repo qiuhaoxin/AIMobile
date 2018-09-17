@@ -1,11 +1,13 @@
 const devServer=require('webpack-dev-server');
 const webpack=require('webpack');
 const config=require('../webpackConfig/webpack.config.dev.js');
+const path=require('path');
+config.entry.unshift('webpack-dev-server/client?http://localhost:3009/',
+	'webpack/hot/dev-server');
 const devServerConfig={
-	contentBase:'../src/public',
+	contentBase:path.resolve(__dirname,"../dist"),//path.resolve(__dirname,"../dist")
 	hot:true,
-	port:3003,
-
+	port:3009,
 }
 
 // console.log("dev config is "+JSON.stringify(config));
@@ -16,7 +18,7 @@ const compiler=webpack(config);
 process.env.NODE_ENV="development";
 process.env.BABEL_ENV="development";
 
-const DEFAULT_PORT=process.env.PORT || 3008;
+const DEFAULT_PORT=process.env.PORT || 3009;
 
 
 const devServerOptins=Object.assign({},devServerConfig,{

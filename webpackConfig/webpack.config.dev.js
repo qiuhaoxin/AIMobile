@@ -16,9 +16,9 @@ const cssnano=require('cssnano');
 
 module.exports={
   mode:'development',
-	entry:{
-       main:paths.appEntry,
-	},
+	entry:[
+      paths.appEntry,
+  ],
 	resolve:{
 		extensions:['.js','.jsx','.less','.css','.jsx','.json'],
 	},
@@ -177,7 +177,7 @@ module.exports={
           inject:true,
           title:'devServer',
        }),
-       new OpenBrowser({url:'http://localhost:3008'}),
+       new OpenBrowser({url:'http://localhost:3009'}),
        new webpack.NamedModulesPlugin(),
        new webpack.HotModuleReplacementPlugin(),//HotModuleReplacementPlugin
   ]

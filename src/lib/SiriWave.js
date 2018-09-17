@@ -9,7 +9,7 @@
 SiriWave9Curve.prototype._respawn = function() {
 	this.amplitude = 0.3 + Math.random() * 0.7;
 	this.seed = Math.random();
-	this.openClass = 2 + (Math.random()*3)|0;
+	this.openClass = 2 + Math.random()*3|0;
 };
 
 SiriWave9Curve.prototype._ypos = function(i) {

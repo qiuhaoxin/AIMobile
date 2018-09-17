@@ -20,7 +20,7 @@ class Tip extends Component{
    	  return (
         <div style={style} className={`${Styles['tip-Wrapper']} ${Styles[visibleClass]}`} onClick={this.handleClick}>
             <div className={Styles.contentRow}>
-                {(icon && typeof icon =='string') ? <img src={icon}/> : (icon ? {icon} : null)}
+                {icon && typeof icon =='string' ? <img src={icon}/> : icon ? {icon} : null}
                 <div className={Styles.content}>
                     {content}
                 </div>

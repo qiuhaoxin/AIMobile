@@ -4,10 +4,10 @@ import {uploadError} from '../utils/utils';
 
 const performance=window.performance;
 export const changeLoading=flag=>{
-	return ({
+	return {
 		type:'changeLoading',
 		showLoading:flag,
-	})
+	}
 }
 //
 function createParams(functionName,desc,duration){
@@ -38,7 +38,7 @@ export const fetchMainPageData=(payload)=>{
             if(response.code!='00'){
               err(dispatch,response['err']);
             }
-            const params=createParams('getMainPage',JSON.stringify(response['data']),(endTime - startTime));
+            const params=createParams('getMainPage',JSON.stringify(response['data']),endTime - startTime);
             uploadError(params);
             dispatch({
             	type:ActionType.FETCH_MAINPAGE_DATA,

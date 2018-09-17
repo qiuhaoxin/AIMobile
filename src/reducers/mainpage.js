@@ -1,5 +1,5 @@
 import * as ActionType from '../action/actionType';
-console.log("exception actiontype is "+ActionType.EXCEPTION);
+
 let initState={
    title:'小K,您好',
    appList:[],

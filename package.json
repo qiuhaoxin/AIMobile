@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node script/start.js",
-    "build": "node script/build.js"
+    "build": "node script/build.js",
+    "lint": "eslint --ext .js src"
   },
   "keywords": [
     "AI"
@@ -14,6 +15,8 @@
   "author": "haoxin_qiu",
   "license": "ISC",
   "dependencies": {
+    "aicomponents": "^1.2.0",
+    "babel-polyfill": "^6.26.0",
     "classnames": "^2.2.6",
     "fastclick": "^1.0.6",
     "isomorphic-fetch": "^2.2.1",
@@ -23,6 +26,7 @@
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.0",
+    "redux-saga": "^0.9.5",
     "redux-thunk": "^2.3.0",
     "webpack": "^4.12.1"
   },
@@ -41,8 +45,10 @@
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
+    "husky": "^0.14.3",
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
+    "lint-staged": "^7.2.0",
     "open-browser-webpack-plugin": "0.0.5",
     "postcss-aspect-ratio-mini": "0.0.2",
     "postcss-cssnext": "^3.1.0",

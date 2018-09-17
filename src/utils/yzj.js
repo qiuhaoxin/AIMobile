@@ -19,16 +19,16 @@ export const isYZJ=()=>{
 	//alert(navigator.userAgent)
 	return navigator.userAgent.match(/Qing\/.*;(iOS|iPhone|Android).*/)?true:false; 
 }
-//获取云之家语音
+//获取云之家语言， 
 export const getYZJLang=()=>{
   const userAgent=navigator.userAgent;
-  return (/lang\:zh\-/g).test(userAgent)==true ? 'chinese' : 'english';
+  return (/lang\:en\-/g).test(userAgent)==true ? 'english':'chinese';
 }
 
 //获取操作系统平台，
 export const getOS=()=>{
-  return (navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/) ? 'iOS' :
-    navigator.userAgent.match(/Android/i) ? 'Android' : '' ); 
+  return navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/) ? 'iOS' :
+    navigator.userAgent.match(/Android/i) ? 'Android' : '' ; 
 }
 
 //获取当前用户的网络状态
@@ -149,6 +149,7 @@ export const speak=(fn)=>{
           fn && fn(result); 
         }else{
           alert("speak error is "+result.error);
+          uploadError(createParams('speak error is ',result.error,0));
         }
     })
 }

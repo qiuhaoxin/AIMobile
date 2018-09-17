@@ -43,8 +43,6 @@ export const saveInLocalStorage=(key,value)=>{
 export const delInLocalStorage=(key)=>{
    if(window.localStorage){
      window.localStorage.removeItem(key);
-   }else{
-
    }
 }
 
@@ -61,8 +59,6 @@ export const getInLocalStorage=(key)=>{
         }catch(e){
           result=result;
         }
-	}else{
-
 	}
 	return result;
 }

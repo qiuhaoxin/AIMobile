@@ -14,10 +14,10 @@ class Select extends Component{
 	}
 	renderItem=()=>{
 		const {dataSource,title,itemKey}=this.props;
-		//console.log("dataSource is "+JSON.stringify(dataSource));
+		console.log("dataSource is "+JSON.stringify(dataSource));
 		const itemArr=dataSource.map((item,index)=><li onClick={()=>this.handleItemClick(item,parseInt(index + 1))} className={Styles['select-item']} 
 			key={`${item[itemKey] ? item[itemKey] : parseInt(index + 1)}`}>
-			<span className={Styles.label}>{item[itemKey] ? item[itemKey] : parseInt(index + 1)}:  </span><span>{item.value}</span></li>)
+			<span className={Styles.label}>{item[itemKey] ? item[itemKey] : parseInt(index + 1)}:  </span><span>{item.desc}</span></li>)
 		return (
 		   <ul className={Styles.list}>
                <li className={Styles.title}>{title}</li>

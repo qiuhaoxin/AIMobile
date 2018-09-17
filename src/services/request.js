@@ -40,7 +40,7 @@ export default function request(url,options){
    	  	 ...newOptions.headers
    	  };
    	  newOptions.body=JSON.stringify(newOptions.body);
-   };
+   }
    return fetch(url,newOptions)
           .then(checkStatus)
           .then((response)=>{

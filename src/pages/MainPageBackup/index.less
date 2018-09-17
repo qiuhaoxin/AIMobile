@@ -4,9 +4,6 @@ body,div,ul,li{
 .dialog{
 	font-size:30px;margin-bottom:32px;
 }
-.recommend-demo{
-	margin-left:30px;margin-top:30px;margin-right:40px;
-}
 .dialogContent{
 	width:100%;display:inline-flex;
 	&-left,&-right{
@@ -57,8 +54,7 @@ body,div,ul,li{
 	      padding:20px 60px;display:flex;flex-direction:row;
 	      position:relative;
 	      &:after{
-	         
-	         position:absolute;height:1px;background-color:#e5e5e5;left:60px;right:60px;bottom:0;
+	         content:'';position:absolute;height:1px;background-color:#e5e5e5;left:60px;right:60px;bottom:0;
 	      }
 	      & .iconPath{
 	          width:156px;display:inline-flex;align-items:center;
@@ -81,10 +77,10 @@ body,div,ul,li{
 	      & .arrow{
              width:80px;position:relative;display:inline-flex;align-items:center;
              &:before{
-                position:absolute;border-left:16px solid #C0C7CE;border-top:16px solid transparent;border-bottom:16px solid transparent;right:0;
+                content:'';position:absolute;border-left:16px solid #C0C7CE;border-top:16px solid transparent;border-bottom:16px solid transparent;right:0;
              }
              &:after{
-                position:absolute;border-left:16px solid #fff;border-top:16px solid transparent;border-bottom:16px solid transparent;right:2px;
+                content:'';position:absolute;border-left:16px solid #fff;border-top:16px solid transparent;border-bottom:16px solid transparent;right:2px;
              }
 	      }
 	   }

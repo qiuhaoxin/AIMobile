@@ -6,5 +6,5 @@ const data=[
    {img:'Marketfees.png',name:'市场活动费报销',id:2},
    {img:'Waterfee.png',name:'水费报销',id:3},
    {img:'otherfee.png',name:'其他',id:4},
-]
+];
 <LinkSelect data={data}></LinkSelect>

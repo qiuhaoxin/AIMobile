@@ -25,7 +25,7 @@
    |
    |---lib 存放第三方库 
    |
-   |---public 
+   |---public 页面
    |
    |---services 网络请求
    |
