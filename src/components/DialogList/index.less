@@ -1,0 +1,22 @@
+.wrapper{
+	width:100%;display:flex;flex-direction:column;position:absolute;left:0;z-index:101;overflow:scroll;top:0;height:1100px;padding-bottom:234px;
+	-webkit-overflow-scrolling:touch;
+	&.ai-dl-show{
+	   display:flex;
+	}
+	&.ai-dl-hide{
+	   display:none;
+	}
+	& .dialogList{
+	    & .dialog-row{
+	        width:74%;display:flex;margin-top:72px;font-size:32px;color:#333;line-height:44px;font-family:PingFangSC-Regular;flex-direction:column;
+	        text-align:left;
+	        &.user-dialog{
+	            float:right;text-align:right;margin-right:60px;justify-content:flex-end;
+	        }
+	        &.chatbot-dialog{
+	            float:left;text-align:left;margin-left:60px;
+	        }
+	    }
+	}
+}
