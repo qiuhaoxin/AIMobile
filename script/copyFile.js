@@ -7,8 +7,8 @@ const messageStr='${message}';
 const avatarStr='${avatar}';
 const welcomeTextStr='${welcomeText}';
 
-const destPath="E:\\AI\\trunk\\0.1\\platform\\web\\src\\main\\webapp\\static";
- const destPath1="E:\\AI\\trunk\\0.1\\platform\\web\\src\\main\\webapp";
+const destPath="E:\\AI\\trunk\\0.1\\platform1\\web\\src\\main\\webapp\\static";
+ const destPath1="E:\\AI\\trunk\\0.1\\platform1\\web\\src\\main\\webapp";
 //要插入html的注入内容
 const insertStr=`  
    <script th:inline="JavaScript" charset="utf-8">  

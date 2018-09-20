@@ -4,7 +4,7 @@ import request from './request.js';
 
 const urlObj={
 	'test':'http://172.20.70.42:8888/rest/chatbot',//172.20.70.42:8888
-	'prod':'./',
+	'prod':'http://172.20.70.42:8888/rest/chatbot',//'./',
 }
 
 //172.20.71.86

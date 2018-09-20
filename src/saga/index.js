@@ -12,43 +12,38 @@ function* getMainPageDataAPI (payload){
 	    	payload:{appList:response.data.appList,title:response.data.title},
 	    })
 	}catch(e){
-        console.log("exception in getMainPageDataAPI in saga/index is "+e);
+        alert("exception in getMainPageDataAPI in saga/index is "+e);
 	}
 }
 
 function* tongyinConvertAPI (payload){
-   // console.log("tongyinConvertAPI payload is "+JSON.stringify(payload));
 	try{
        const response=yield call(tongyinConvert,payload);
-       //console.log("response in tongyinConvert is "+JSON.stringify(response));
-       // yield put({
-       //    type:ActionType.DEAL_TONGYIN_CONVERT,
-       //    payload:response.text,
-       // })
        return response;
 	}catch(e){
-
+       alert("exception in saga/tongyinConvertAPI is "+e);
 	}
 }
 
 function* getChatSessionIdAPI(payload){
-	console.log("getChatSessionId is "+JSON.stringify(payload));
 	try{
        const response=yield call(getChatSessionId,payload.payload);
-       console.log("response is "+JSON.stringify(response));
        yield put({
        	 type:ActionType.DEAL_SESSION_ID,
        	 payload:response.chatSessionID,
        })
 	}catch(e){
-
+      alert("exception in saga/getChatSessionIdAPI is "+e);
 	}
 }
 
 function* chatAPI(payload){
+    if('payload' in payload){
+      payload=payload.payload;
+    }
     try{
         const response=yield call(chat,payload);
-        console.log("chatAPI response is "+JSON.stringify(response));
+        //console.log("chatAPI response is "+JSON.stringify(response));
         yield put({
         	type:ActionType.DEAL_CHAT,
         	payload:{
@@ -59,7 +54,7 @@ function* chatAPI(payload){
         	},
         })
     }catch(e){
-    	console.log("exception in chatAPI/saga is "+e);
+    	alert("exception in chatAPI/saga is "+e);
     }
 }
 
@@ -83,7 +78,7 @@ function* watchSayAPI(){
 		   const response=yield call(tongyinConvertAPI,payload.payload);
 		   yield call(chatAPI,{sessionId,message:response.text});
        }catch(e){
-
+          alert("exception in watchSayAPI is "+e);
        }
 	}
 }
@@ -93,10 +88,10 @@ export default function* rootSaga() {
 	   yield fork(watchGetMainPageData);
 	   yield fork(watchGetSessionID);
 	  // yield fork(watchTongyinConvert);
-	  // yield fork(watchChatAPI);
+	   yield fork(watchChatAPI);
 	   yield fork(watchSayAPI);
    }catch(e){
-      console.log("exception in saga/rootSaga is "+e);
+      alert("exception in saga/rootSaga is "+e);
    }
 
 }

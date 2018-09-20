@@ -15,10 +15,10 @@ let initState={
 const mainpage=(state=initState,action)=>{
      switch(action.type){
         case ActionType.DEAL_MAINPAGE_DATA:
-            //console.log("action payload is "+JSON.stringify(action.payload));
+            console.log("action payload is "+JSON.stringify(action.payload));
             let data=action.payload;
             data.appList.forEach(item=>{
-              if(item.ficonpath.indexOf('static/Icon')==-1){
+              if(item.ficonpath && item.ficonpath.indexOf('static/Icon')==-1){
                  item.ficonpath='http://172.20.70.42:8888/rest/static/Icon/'+item.ficonpath;
               }
             })

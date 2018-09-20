@@ -1,5 +1,5 @@
 .wrapper{
-	width:100%;display:flex;flex-direction:column;position:absolute;left:0;z-index:101;overflow:scroll;top:0;height:1100px;padding-bottom:234px;
+	width:100%;display:flex;flex-direction:column;position:absolute;left:0;z-index:101;overflow:scroll;top:0;height:1100px;padding-bottom:238px;
 	-webkit-overflow-scrolling:touch;
 	&.ai-dl-show{
 	   display:flex;
@@ -8,6 +8,8 @@
 	   display:none;
 	}
 	& .dialogList{
+	    width:100%;position:absolute;left:0;z-index:101;overflow:scroll;top:0;height:1100px;padding-bottom:234px;
+       -webkit-overflow-scrolling:touch;
 	    & .dialog-row{
 	        width:74%;display:flex;margin-top:72px;font-size:32px;color:#333;line-height:44px;font-family:PingFangSC-Regular;flex-direction:column;
 	        text-align:left;
@@ -18,5 +20,27 @@
 	            float:left;text-align:left;margin-left:60px;
 	        }
 	    }
+	}
+}
+
+.dialogContent{
+	width:100%;display:inline-flex;
+	&-left,&-right{
+       width:50%;display:flex;flex-direction:column;
+	}
+	&-right{
+	   justify-content:flex-end;align-items:flex-end;
+	}
+	& .loc{
+	   font-size:32px;color:#999;margin-top:12px;
+	}
+	& .loc_fill{
+	    color:#333;
+	}
+	& .time{
+	   font-size:26px;color:#999;margin-top:12px;
+	}
+	& .time_fill{
+	   color:#333;
 	}
 }

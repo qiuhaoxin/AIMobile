@@ -60,7 +60,6 @@ class MainPage extends Component{
        showDialogList:false,
     }
     componentWillReceiveProps(nextProps){
-        console.log("nextProps text is "+nextProps.text);
         if(nextProps.text){
            this.setState({
               dialog:nextProps.text,
@@ -80,10 +79,10 @@ class MainPage extends Component{
        //alert("sessionId is Localstorage is "+getInLocalStorage('sessionId')+" and window chatSessionId is "+window.chatSessionId);
        const sessionId=getInLocalStorage('sessionId') || window.chatSessionId || '';
        if(sessionId){
-         // dispatch({
-         //    type:FETCH_SESSION_ID,
-         //    payload:sessionId,
-         // })
+          dispatch({
+             type:ActionType.DEAL_SESSION_ID,
+             payload:sessionId,
+          })
        }else{
         const result= getValueFromUrl(!isEmpty(location.search) ? location.search : location.href,['appid','openId','uname']);
         //getChatSessionIdAPI({appid:result['appid'],openId:result['openId'],uname:result['uname']})
@@ -151,14 +150,17 @@ class MainPage extends Component{
                      onBtnClick={this.handleChangeApp} onItemClick={this.handleItemClick}>
                  </RecommendCard>
               </div>
+
+              <div ref={el=>this.AppTip=el}>
+                 <AppTips visible={appTipsVisible}></AppTips>
+              </div>
+
+              <div>
+                  <DialogList visible={this.state.showDialogList} sessionId={sessionId} dispatch={dispatch}>
+                  </DialogList>
+              </div>
             </div>
-            <div ref={el=>this.AppTip=el}>
-               <AppTips visible={appTipsVisible}></AppTips>
-            </div>
-            <div>
-                <DialogList visible={this.state.showDialogList} sessionId={sessionId} dispatch={dispatch}>
-                </DialogList>
-            </div>
+
             <Footer sessionId={sessionId} dispatch={this.props.dispatch} onEnterClick={this.handleInput}></Footer>
          </div>
       )
@@ -174,3 +176,14 @@ export default connect(state=>{
      text:state.mainpage.text,
   }
 })(MainPage);
+
+/*
+            <div ref={el=>this.AppTip=el}>
+               <AppTips visible={appTipsVisible}></AppTips>
+            </div>
+            <Footer sessionId={sessionId} dispatch={this.props.dispatch} onEnterClick={this.handleInput}></Footer>
+            <div>
+                <DialogList visible={this.state.showDialogList} sessionId={sessionId} dispatch={dispatch}>
+                </DialogList>
+            </div>
+*/

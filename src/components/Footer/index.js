@@ -1,18 +1,39 @@
-import React,{PureComponent} from 'react';
+import React,{Component} from 'react';
 import PropTypes from 'prop-types';
 import Styles from './index.less';
 import {isYZJ,speak,getYZJLang,getOS,playVoice,stopPlayVoice,startSpeech,stopSpeech} from '../../utils/yzj';
 import SiriWave from '../../lib/SiriWave';
-import xiaoK from '../../images/xiaok.png';
+import xiaok from '../../images/xiaok.png';
 import * as ActionType from '../../action/actionType';
 import {isEmpty,FilterMaxId,saveInLocalStorage,getInLocalStorage,delInLocalStorage,getValueFromUrl} from '../../utils/utils';
-class Footer extends PureComponent{
+
+let isSupportYZJApi=true;
+let talk=startSpeech;
+let stopTalk=stopSpeech;
+
+class Footer extends Component{
 	constructor(props){
 		super(props);
 	};
 	state={
 		inputStr:'',
 	}
+  componentDidMount(){
+      try{
+        this.checkyyAP();//检测云之家当前版本是否支持最新的语音接口
+      }catch(e){
+
+      }
+  }
+  checkyyAP=()=>{
+      stopSpeech((errorCode,error)=>{
+          if(error){
+              talk=speak;
+              stopTalk=null;
+              //isSupportYZJApi=false;
+          }
+      })
+  }
 	handleSpeak=(result)=>{
        let text="";
        if(result && String(result['success'])=='true'){
@@ -27,12 +48,13 @@ class Footer extends PureComponent{
     }
     dealSpeak=(text)=>{
       const _this=this;
-      const {tongyinConvertAPI,sessionId}=this.props;
+      const {sessionId,onEnterClick}=this.props;
       if(this.ContentTip && this.ContentTip.style.display!='none'){
         this.hideMainPage();
         this.showDialogList();
       }
-      tongyinConvertAPI({sessionId,text})
+      //tongyinConvertAPI({sessionId,text})
+      onEnterClick && onEnterClick(text);
     }
     handleClickBall=()=>{
         const _this=this;
@@ -41,11 +63,13 @@ class Footer extends PureComponent{
              _this.localId=0;
           })
         }
+
         //隐藏图片按钮，显示声波图
         isSupportYZJApi && this.changeSpeakStyle('none','block');
         //speak(this.handleSpeak);
        talk((result)=>{  
            const data=result.data;
+
            if(isSupportYZJApi){
                const status=data.status;
                switch(status){
@@ -99,6 +123,7 @@ class Footer extends PureComponent{
         this.SpeakIcon.style['display']=SpeakIconStyle;
       }
       if(this.Wave){
+        console.log("Wave is here")
         this.Wave.style['display']=WaveStyle;
       }
       if(!this.siriWave && isSupportYZJApi){
@@ -114,33 +139,19 @@ class Footer extends PureComponent{
               stopTalk && stopTalk(()=>_this.changeSpeakStyle('block','none'))
              
             }
-            /*   
-            speed: 0.2,
-            color: '#000',
-            frequency: 2
-            */
         });
       }
     }
     handleKeyup=(e)=>{
         const _this=this;
-        const {tongyinConvertAPI,sessionId,chatAPI,dispatch,onEnterClick}=this.props;
+        const {sessionId,dispatch,onEnterClick}=this.props;
         const key=e.keyCode;
         //let dialog=this.state.dialogList;
         if(key==13){
           const value=e.target.value;
-          console.log("text is "+value);
           if(isEmpty(value))return;
-          // const value=e.target.value;
-          // if(isEmpty(value))return;
-          // if(this.ContentTip && this.ContentTip.style.display!='none'){
-          //     this.hideMainPage();
-          //     this.showDialogList();
-          // }
-           e.target.value="";
-          // tongyinConvertAPI({text:value,sessionId});
+          e.target.value="";
           onEnterClick && onEnterClick(value);
-          //dispatch({type:ActionType.TONG_YIN_CONVERT,payload:{text:value,sessionId}})
         }
     }
 	render(){
@@ -148,11 +159,11 @@ class Footer extends PureComponent{
            <div className={Styles.wrapper}>
                 <div ref={el=>this.SpeakIcon=el} style={{display:'block'}}>
                  {
-                     isYZJ() ? 
-                     <div className={Styles.ball} onClick={this.handleClickBall}>
-                        <img src={xiaok} />
-                     </div> 
-                     : <input placeholder="输入" onKeyUp={this.handleKeyup} />
+                       isYZJ() ? 
+                       <div className={Styles.ball} onClick={this.handleClickBall}>
+                          <img src={xiaok} />
+                       </div> : 
+                       <input placeholder="输入" onKeyUp={this.handleKeyup} />
                  }
                 </div>
                 <div ref={el=>this.Wave=el} style={{display:'none'}}>
@@ -170,3 +181,12 @@ Footer.propTypes={
 }
 
 export default Footer;
+
+/*
+                       isYZJ() ? 
+                       <div className={Styles.ball} onClick={this.handleClickBall}>
+                          <img src={xiaok} />
+                       </div> : 
+                       :
+                       <input placeholder="输入" onKeyUp={this.handleKeyup} />
+*/
