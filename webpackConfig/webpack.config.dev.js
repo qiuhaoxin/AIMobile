@@ -173,11 +173,11 @@ module.exports={
           REQUESTURL:JSON.stringify('test'),
        }),
        new HtmlWebpackPlugin({
-          template:paths.appHtml,
+          template:paths.appDevHtml,
           inject:true,
           title:'devServer',
        }),
-       new OpenBrowser({url:'http://localhost:3009'}),
+       new OpenBrowser({url:'http://localhost:3009?appid=500045674&openId=5ad04e76e4b05c4b7d6245ba&uname=邱浩新'}),
        new webpack.NamedModulesPlugin(),
        new webpack.HotModuleReplacementPlugin(),//HotModuleReplacementPlugin
   ]

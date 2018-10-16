@@ -148,7 +148,7 @@ export const speak=(fn)=>{
         if(String(result.success)=='true'){
           fn && fn(result); 
         }else{
-          alert("speak error is "+result.error);
+          //alert("speak error is "+result.error);
           uploadError(createParams('speak error is ',result.error,0));
         }
     })
@@ -163,7 +163,8 @@ export const stopPlayVoice=(localId,fn)=>{
         if(String(result.success)=='true'){
           fn && fn(result);
         }else{
-          uploadError(createParams('stopPlayVoice',result.error,0));
+          //alert("stopPlayVoice"+result.error);
+         // uploadError(createParams('stopPlayVoice',result.error,0));
         }
       }
   );
@@ -173,7 +174,7 @@ export const stopPlayVoice=(localId,fn)=>{
 /*
 * 语音播报接口
 */
-export const playVoice=(msgContent,fn)=>{
+export const playVoice=(msgContent,fn,afterFn)=>{
     XuntongJSBridge.call('voiceSynthesize',{
         'text':msgContent,
         'voiceName':'xiaoyan'
@@ -181,11 +182,18 @@ export const playVoice=(msgContent,fn)=>{
       if (result.success == true || result.success == 'true') {
             //_this.localId = result.data.localId;
             const localId=result.data.localId;
+            fn && fn(localId,result);
             const len = result.data.len;
-            XuntongJSBridge.call('playVoice', { localId:localId},
-                function(result) {
-                fn && fn(localId,result);
-            });
+            XuntongJSBridge.call('playVoice', { localId:localId},function(result){
+                 //alert("result is "+JSON.stringify(result));
+                 if(String(result['success'])=='true'){
+                    if(result['data'] && result['data']['playStatus']==1){
+                      afterFn && afterFn();
+                    }
+                 }else{
+                    alert("playVoice error is "+result['error']);
+                 }
+            })
       }else{
         //alert("playVoice error is "+result.error);
          uploadError(createParams('playVoice',result.error,0));
@@ -209,11 +217,13 @@ export const backYZJ=(fn)=>{
 *开始录音接口
 */
 export const startSpeech=(fn)=>{
+
     XuntongJSBridge.call('startSpeechRecognize',{},function(result){
+      //alert("rsult is "+JSON.stringify(result))
       if(String(result.success)=='true'){
             fn && fn(result); 
         }else{
-           alert("errorMessage is "+result.error+" and error code is "+result.errorCode);
+           //alert("errorMessage11 is "+result.error+" and error code is "+result.errorCode);
            uploadError(createParams('startSpeech',result.error,0));
         }
     })

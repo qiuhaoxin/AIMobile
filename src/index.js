@@ -11,6 +11,9 @@ import reducers  from './reducers';
 //const store=createStore(reducers,applyMiddleware(sagaMiddleware));
 //sagaMiddleware.run(RootSaga);
 import store from './configStore';
+import fastclick from 'fastclick';
+
+fastclick.attach(document.body);
 
 function render(MyCompnent){
 	return ReactDOM.render(
@@ -21,7 +24,6 @@ function render(MyCompnent){
 	)
 }
 render(Router);
-
 
 if(module.hot){
 	module.hot.accept(()=>{

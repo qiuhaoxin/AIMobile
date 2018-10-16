@@ -9,7 +9,7 @@ const cssFilename = 'static/css/[name].[hash:8].css';
 
 const ExtractTextOptions=Array(cssFilename.split('/').length).join('../');
 //console.log("ExtractTextOptions is "+ExtractTextOptions);
-const manifest=require('../vendor.manifest.json');
+const manifest=require('./dll/vendor-manifest.json');
 const pathToClean=[
   'dist'
 ]
@@ -203,7 +203,8 @@ module.exports={
           REQUESTURL:JSON.stringify('prod'),   //记得用JSON.stringify() 或 '"prod"'
        }),
        // new webpack.DllReferencePlugin({
-       //    manifest
+       //    manifest,
+       //    context:__dirname,
        // }),
        new cleanWebpackPlugin(pathToClean,{root:path.resolve(__dirname,"../")}),
        new HtmlWebpackPlugin({

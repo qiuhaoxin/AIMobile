@@ -4,7 +4,7 @@ import request from './request.js';
 
 const urlObj={
 	'test':'http://172.20.70.42:8888/rest/chatbot',//172.20.70.42:8888
-	'prod':'http://172.20.70.42:8888/rest/chatbot',//'./',
+	'prod':'./',//'./',
 }
 
 //172.20.71.86
@@ -67,6 +67,15 @@ export const chat=(params)=>{
 //上传日志 埋点前端监控
 export const uploadLog=(params)=>{
 	return request(urlPath + "/uplodaMobileLog",{
+		method:'POST',
+		body:params,
+	})
+}
+
+
+//获取意图样本---引导语
+export const getSamples=(params)=>{
+	return request(urlPath+"/fetchIntentionSample",{
 		method:'POST',
 		body:params,
 	})

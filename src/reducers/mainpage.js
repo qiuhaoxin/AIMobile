@@ -10,17 +10,19 @@ let initState={
    text:'',//同音转换结果
    dialog:'',//用户输入
    exception:'',//异常
+   appMessage:[],//意图样本
+   //status:'clarify',//意图的状态  clarify:正在进行  satisfy:已完成
+   localId:-1,//  语音播报的id
+   startRecord:false,
 }
 
 const mainpage=(state=initState,action)=>{
      switch(action.type){
         case ActionType.DEAL_MAINPAGE_DATA:
-            console.log("action payload is "+JSON.stringify(action.payload));
+            //console.log("action payload is "+JSON.stringify(action.payload));
             let data=action.payload;
             data.appList.forEach(item=>{
-              if(item.ficonpath && item.ficonpath.indexOf('static/Icon')==-1){
-                 item.ficonpath='http://172.20.70.42:8888/rest/static/Icon/'+item.ficonpath;
-              }
+                 item.ficonpath='http://172.20.70.42:8888/rest/static/Icon/9/gongzuoliu.png';
             })
             return {
             	...state,
@@ -29,7 +31,7 @@ const mainpage=(state=initState,action)=>{
         break;
 
         case ActionType.DEAL_TONGYIN_CONVERT:
-            console.log("DEAL_TONGYIN_CONVERT is "+action.payload);
+            //console.log("DEAL_TONGYIN_CONVERT is "+action.payload);
             return {
               ...state,
               text:action.payload,
@@ -37,7 +39,6 @@ const mainpage=(state=initState,action)=>{
             }
         break;
         case ActionType.DEAL_CHAT:
-            //console.log("action deal chat is "+JSON.stringify(action.payload));
             return {
               ...state,
               ...action.payload,
@@ -45,14 +46,13 @@ const mainpage=(state=initState,action)=>{
             }
         break;
         case ActionType.DEAL_SESSION_ID:
-           console.log("pay is "+JSON.stringify(action.payload));
+           //console.log("pay is "+JSON.stringify(action.payload));
            return {
               ...state,
               sessionId:action.payload,
            }
         break;
         case ActionType.SAY:
-           //console.log("payload in say reducer is "+JSON.stringify(action.payload));
            return {
               ...state,
               kdIntention:null,
@@ -60,12 +60,29 @@ const mainpage=(state=initState,action)=>{
            }
         break;
         case ActionType.EXCEPTION://异常处理
-           console.log("exc is "+action);
            return {
               ...state,
               exception:action.payload,
               text:'',
            }
+        break;
+        case ActionType.DEAL_INTENTION_SAMPLES:
+           return {
+              ...state,
+              appMessage:action.payload,
+           }
+        break;
+        case ActionType.LOCAL_ID://保存播报语音的
+            return {
+                ...state,
+                localId:action.payload.localId,
+            }
+        break;
+        case ActionType.START_RECORD://开始录音
+            return {
+                ...state,
+                startRecord:action.payload.startRecord,
+            }
         break;
         default:
             return state;

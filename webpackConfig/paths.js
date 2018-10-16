@@ -11,4 +11,5 @@ module.exports={
 	appEntry:resolvePath('src/index.js'),
 	appDist:resolvePath('dist'),
 	appHtml:resolvePath('src/public/index.html'),
+	appDevHtml:resolvePath('src/public/index_dev.html'),
 }

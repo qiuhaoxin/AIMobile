@@ -1,7 +1,7 @@
 import {put,take,call,cancel,fork} from 'redux-saga/effects';
 import {takeEvery,takeLastest,all} from 'redux-saga';//高级API
 import * as ActionType from '../action/actionType';
-import {getMainPageData,uploadLoc,tongyinConvert,chat,getChatSessionId,EXCEPTION} from '../services/api';
+import {getMainPageData,uploadLoc,tongyinConvert,chat,getChatSessionId,EXCEPTION,getSamples} from '../services/api';
 
 //获取chatbot主页的应用列表
 function* getMainPageDataAPI (payload){
@@ -11,6 +11,7 @@ function* getMainPageDataAPI (payload){
 	    	type:ActionType.DEAL_MAINPAGE_DATA,
 	    	payload:{appList:response.data.appList,title:response.data.title},
 	    })
+      payload.callback && payload.callback(response.data);
 	}catch(e){
         alert("exception in getMainPageDataAPI in saga/index is "+e);
 	}
@@ -19,6 +20,9 @@ function* getMainPageDataAPI (payload){
 function* tongyinConvertAPI (payload){
 	try{
        const response=yield call(tongyinConvert,payload);
+       // yield put({
+       //   type:ActionType.
+       // })
        return response;
 	}catch(e){
        alert("exception in saga/tongyinConvertAPI is "+e);
@@ -43,19 +47,61 @@ function* chatAPI(payload){
     }
     try{
         const response=yield call(chat,payload);
-        //console.log("chatAPI response is "+JSON.stringify(response));
         yield put({
         	type:ActionType.DEAL_CHAT,
         	payload:{
         		message:JSON.parse(response['message']),
         		kdIntention:JSON.parse(response['kdIntention']),
-        		text:payload.message,
+        		text:payload.message,//payload.message
         		lastUnfinishedIntention:response['lastUnfinishedIntention'] && JSON.parse(response['lastUnfinishedIntention']),
         	},
         })
     }catch(e){
     	alert("exception in chatAPI/saga is "+e);
     }
+}
+
+function* getSamplesAPI(payload){
+   try{
+       console.log("getSamplesAPI is "+JSON.stringify(payload));
+       const response=yield call(getSamples,payload.payload);
+       console.log("response is "+JSON.stringify(response));
+
+   }catch(e){
+      alert("exception is getSamplesAPI/saga is "+e);
+   }
+}
+
+//首次上报位置
+function* uploadLocationAPI(payload){
+   try{
+        const response=yield call(uploadLoc,payload.payload);
+        //alert("response is "+JSON.stringify(response));
+
+   }catch(e){
+      alert("exception in updateLocationAPI/saga is "+e);
+   }
+}
+
+//获取意图的样本
+function* getIntentionSample(payload){
+   try{
+      //console.log("getIntentionSample payload is "+JSON.stringify(payload));
+      const response=yield call(getSamples,payload.payload);
+      //console.log("response in getIntentionSample is "+JSON.stringify(response));
+      if(response.result.result==1){
+         let tempArr=[];
+         const list=response.result.data;
+         list.list.forEach(item=>tempArr.push(item.sentence));
+         yield put({
+           type:ActionType.DEAL_INTENTION_SAMPLES,
+           payload:tempArr,
+         })
+      }
+
+   }catch(e){
+      alert("exception in getIntentionSample is "+e);
+   }
 }
 
 function* watchGetMainPageData(){
@@ -70,6 +116,9 @@ function* watchGetSessionID(){
 function* watchChatAPI(){
 	yield takeEvery(ActionType.CHAT,chatAPI);
 }
+function* watchUpdateLocAPI(){
+  yield takeEvery(ActionType.UPLOAD_LOC,uploadLocationAPI);
+}
 function* watchSayAPI(){
 	while(true){
        try{
@@ -83,6 +132,26 @@ function* watchSayAPI(){
 	}
 }
 
+function* watchLocalID(){
+  while(true){
+    try{
+      const payload=yield take(ActionType.LOCAL_ID);
+      alert("payload saga is "+JSON.stringify(payload));
+      yield put({
+         type:ActionType.SAVE_LOCAL_ID,
+         payload:payload.payload.localId,
+      })
+    }catch(e){
+
+    }
+  }
+}
+
+
+function* watchSampleAPI(){
+  yield takeEvery(ActionType.FETCH_INTENTION_SAMPLES,getIntentionSample);
+}
+
 export default function* rootSaga() {
    try{
 	   yield fork(watchGetMainPageData);
@@ -90,6 +159,9 @@ export default function* rootSaga() {
 	  // yield fork(watchTongyinConvert);
 	   yield fork(watchChatAPI);
 	   yield fork(watchSayAPI);
+     yield fork(watchUpdateLocAPI);
+     yield fork(watchSampleAPI);
+     //yield fork(watchLocalID);
    }catch(e){
       alert("exception in saga/rootSaga is "+e);
    }

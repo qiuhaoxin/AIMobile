@@ -1,12 +1,19 @@
 .wrapper{
-	width:100%;margin-left:60px;flex-direction:column;
+	padding-left:60px;flex-direction:column;margin-top:80px;
 	&.ai-at-show{
 	    display:flex;
 	}
 	&.ai-at-hide{
 	   display:none;
 	}
+	& .tipMsg{
+	   font-size:40px;
+	}
 	&>ul{
-	   list-style:none;
+	   list-style:none;padding-left:20px;color:#555;
+	   & > li{
+	      padding-top:6px;
+	      padding-bottom:6px;
+	   }
 	}
 }

@@ -5,19 +5,13 @@ import PropTypes from 'prop-types';
 class AppTips extends Component{
 	constructor(props){
 		super(props);
-		this.data=[
-           '我明天要去北京出差',
-           '我要出差去北京',
-           '我9号去北京出差',
-           '我明天出差北京,下周二回来',
-           '出差去北京参加客户大会',
-		]
 	}
 	componentWillReceiveProps(nextProps){
 
 	}
 	renderTipList=()=>{
-		const appTips=this.data;
+		const {appTips}=this.props;
+		console.log("appTips is "+JSON.stringify(appTips));
 		const listStr=appTips.map((item,index)=><li key={index}>
             <div>{item}</div>
 		</li>)
@@ -33,7 +27,7 @@ class AppTips extends Component{
         console.log("classNameStr is "+classNameStr);
 		return (
 			<div className={`${Styles.wrapper} ${Styles[classNameStr]}`}>
-                <div>
+                <div className={`${Styles.tipMsg}`}>
                     {desc}
                 </div>
                 {

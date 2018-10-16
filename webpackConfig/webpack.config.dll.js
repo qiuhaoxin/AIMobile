@@ -7,14 +7,15 @@ module.exports={
 		vendor:['react','react-dom','react-router-dom','redux','prop-types','react-redux','redux-saga','classnames'],
 	},
 	output:{
-		path:path.join(__dirname,'../','static'),
+		path:path.join(__dirname,'dll'),
 		filename:'dll.[name].js',
-		library:'[name]',
+		library:'[name]_library',
 	},
 	plugins:[
        new webpack.DllPlugin({
-       	  name:'[name]',
-       	  path:path.join(__dirname,'../','[name].manifest.json'),
+       	  name:'[name]_library',
+       	  path:path.join(__dirname,'dll','[name]-manifest.json'),
+          context:__dirname,
        })
 	]
 }
