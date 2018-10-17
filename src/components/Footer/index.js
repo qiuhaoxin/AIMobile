@@ -172,16 +172,6 @@ class Footer extends Component{
         //SpeakIconStyle 图标样式,WaveStyle 声波图样式   
     changeSpeakStyle=(SpeakIconStyle='block',WaveStyle='none')=>{
       const _this=this;
-      // if(SpeakIconStyle==WaveStyle){
-      //   console.warn("两个的样式不能一致!");
-      //   return;
-      // }
-      // if(this.SpeakIcon){
-      //   this.SpeakIcon.style['display']=SpeakIconStyle;
-      // }
-      // if(this.Wave){
-      //   this.Wave.style['display']=WaveStyle;
-      // }
       if(!this.siriWave && isSupportYZJApi){
         this.siriWave = new SiriWave({
             container: this.Wave,

@@ -113,11 +113,6 @@ class MainPage extends Component{
     //判断页面的入口来源 urlParams:{scene:next}从下一代的应用进来
     sceneSource=()=>{
        const result= getValueFromUrl(!isEmpty(location.search) ? location.search : location.href,'scene');
-       console.log("result is "+JSON.stringify(result));
-       // if('scene' in result){
-       //    return true;
-       // }
-       // return false;
        return result['scene'];
     }
     uploadLocation=(result)=>{
@@ -200,16 +195,10 @@ class MainPage extends Component{
         },TIME_TO_HIDE)
       }
     }
-    handelReceiveChat=()=>{
-        console.log("handelReceiveChat!!!!");
-        // this.setState({
-        //    startTalk:true,
-        // })
-    }
     render(){
       const {title,appList,sessionId,dispatch,appMessage}=this.props;
       const {appTipsVisible,showDialogList,showRecommend}=this.state;
-      console.log("appMessage is "+JSON.stringify(appMessage));
+      //console.log("appMessage is "+JSON.stringify(appMessage));
       return (
          <div className={Styles.wrapper}>
 
@@ -228,9 +217,8 @@ class MainPage extends Component{
               </div>
 
               <div>
-                  <DialogList visible={this.state.showDialogList} sessionId={sessionId} dispatch={dispatch} receiveChat={this.handelReceiveChat}>
+                  <DialogList visible={this.state.showDialogList} sessionId={sessionId} dispatch={dispatch}>
                   </DialogList>
-
               </div>
             </div>
             <Footer sessionId={sessionId} dispatch={this.props.dispatch} onEnterClick={this.handleInput}></Footer>

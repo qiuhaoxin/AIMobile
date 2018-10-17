@@ -31,11 +31,11 @@ const mainpage=(state=initState,action)=>{
         break;
 
         case ActionType.DEAL_TONGYIN_CONVERT:
-            //console.log("DEAL_TONGYIN_CONVERT is "+action.payload);
+            //console.log("DEAL_TONGYIN_CONVERT is "+JSON.stringify(action.payload));
             return {
               ...state,
-              text:action.payload,
-              message:null,//置为null，避免主页在同音词转换和请求chat接口直接循环请求
+              ...action.payload,
+              //message:null,//置为null，避免主页在同音词转换和请求chat接口直接循环请求
             }
         break;
         case ActionType.DEAL_CHAT:
@@ -53,10 +53,11 @@ const mainpage=(state=initState,action)=>{
            }
         break;
         case ActionType.SAY:
+           //console.log("say in reducers "+JSON.stringify(action));
            return {
               ...state,
-              kdIntention:null,
-              ...action.payload,
+              // kdIntention:null,
+              // ...action.payload,
            }
         break;
         case ActionType.EXCEPTION://异常处理

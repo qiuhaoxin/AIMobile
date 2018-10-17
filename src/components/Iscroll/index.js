@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
-import './index.less';
+import Styles from './index.less';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import IScroll from './iscroll';
@@ -23,7 +23,7 @@ class Iscroll extends Component{
        this.initIscroll();
 	}
 	componentWillUnmount(){
-		this.destoryIscroll();
+		//this.destoryIscroll();
 	}
 	//初始化
 	initIscroll=()=>{
@@ -31,14 +31,23 @@ class Iscroll extends Component{
         const _this=this;
 	    const options={};
         try{
-            //setTimeout(function(){
-                const iScrollInstance=new IScroll(ReactDOM.findDOMNode(this),options);
-                this.iScrollInstance=iScrollInstance;
-            //},300)
+            const iScrollInstance=new IScroll(ReactDOM.findDOMNode(this),options);
+            this.iScrollInstance=iScrollInstance;
+            this.iScrollInstance.on('scrollEnd',function(){
+                setTimeout(function(){
+                   _this.iScrollInstance.refresh();
+                },200)
+            })
         }catch(e){
            console.log("e is "+e);
         }
+
 	}
+    refresh=()=>{
+        if(this.iScrollInstance){
+            this.iScrollInstance.refresh();
+        }
+    }
 	//销毁
 	destoryIscroll=()=>{
 		if(this.iScrollInstance){
@@ -72,9 +81,6 @@ class Iscroll extends Component{
     		_this.refresh(iScrollInstance);
     	}
     }
-    refresh=(iScroll)=>{
-
-    }
     scrollBy=(x,y,time,easing)=>{
         console.log("y is "+y);
     	this.iScrollInstance.scrollBy(x,y,time,null,true);
@@ -84,7 +90,7 @@ class Iscroll extends Component{
     }
 	render(){
 		return (
-          <div className={'iscroll-wrapper'}>
+          <div className={`${Styles.wrapper}`}>
              {this.props.children}
           </div>
 		)

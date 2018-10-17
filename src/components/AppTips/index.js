@@ -11,7 +11,6 @@ class AppTips extends Component{
 	}
 	renderTipList=()=>{
 		const {appTips}=this.props;
-		console.log("appTips is "+JSON.stringify(appTips));
 		const listStr=appTips.map((item,index)=><li key={index}>
             <div>{item}</div>
 		</li>)
@@ -24,7 +23,6 @@ class AppTips extends Component{
 	render(){
 		const {desc,visible}=this.props;
         const classNameStr=visible ? 'ai-at-show' : 'ai-at-hide';
-        console.log("classNameStr is "+classNameStr);
 		return (
 			<div className={`${Styles.wrapper} ${Styles[classNameStr]}`}>
                 <div className={`${Styles.tipMsg}`}>

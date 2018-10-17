@@ -6,7 +6,7 @@ import {isEmpty,FilterMaxId,saveInLocalStorage,getInLocalStorage} from '../../ut
 import {isYZJ,speak,backYZJ,playVoice,stopPlayVoice,startSpeech,stopSpeech} from '../../utils/yzj';
 import * as ActionType from '../../action/actionType';
 import {connect} from 'react-redux';
-import {TypeIn,ExpandList,NumberCard,VoiceReceive,Tip} from 'aicomponents';
+import {TypeIn,ExpandList,NumberCard,VoiceReceive,Tip,Frame} from 'aicomponents';
 import Iscroll from '../Iscroll';
 
 const DIALOG_TITLE="请填写出差事由";
@@ -28,8 +28,11 @@ class DialogList extends Component{
     showTip:false,
 	}
 	componentWillReceiveProps(nextProps){
-        if(nextProps.text && nextProps.kdIntention){
-        	this.addToDialogList(nextProps);
+        if(nextProps.text){
+          this.addUserDialog(nextProps);
+        }
+        if(nextProps.kdIntention!=null){
+          this.addSystemDialog(nextProps);
         }
 	}
   componentDidMount(){
@@ -57,14 +60,24 @@ class DialogList extends Component{
           },TIME_TO_SCROLL)
       }
   }
-	addToDialogList=(props=this.props)=>{
+  translateList=(listHeight)=>{
+     if(this.wrapper){
+         this.wrapper.scrollTo(0,-listHeight,200,{});
+     }
+  }
+  addUserDialog=(props=this.props)=>{
         let {dialogList}=this.state;
-        //console.log("dealMessageType props is "+JSON.stringify(props));
-        const {message,kdIntention,text,lastUnfinishedIntention}=props;
-
-        const {status}=kdIntention
-		    const id=FilterMaxId(dialogList,'id');
+        const listHeight=this.DialogListWrapper.clientHeight;
+        if(listHeight!=0){
+          this.translateList(listHeight);
+        }
+        const {text}=props;
+        const id=FilterMaxId(dialogList,'id');
         dialogList.push({className:'user-dialog',text,id});
+  }
+  addSystemDialog=(props=this.props)=>{
+        let {dialogList}=this.state;
+        const {message,kdIntention,text,lastUnfinishedIntention}=props;
         const result=this.dealMessageType(message,kdIntention,dialogList);
         //如果意图切换了，弹出Tip提醒可以返回上个意图
         if(lastUnfinishedIntention){
@@ -72,8 +85,7 @@ class DialogList extends Component{
         }
         dialogList.push(result);
         this.dealDialogEnd(status);
-
-	}
+  }
   getReason=(kdWordslots,key)=>{
        const result=kdWordslots.filter(kdWordslot=>kdWordslot['number']==key)[0];
        if(result){
@@ -185,7 +197,6 @@ class DialogList extends Component{
   }
 	//渲染对话框
     renderDialog=(item)=>{
-        console.log("item renderDialog is "+JSON.stringify(item));
         const {kdIntention,type,text}=item;
         const _this=this;
         const {say}=kdIntention;
@@ -244,7 +255,6 @@ class DialogList extends Component{
       this.hardToUpdate({className:'user-dialog',text:GOOD_BYB});
     }
     renderVoiceReceive=(item)=>{
-        console.log("hei");
         const {text}=item;
         const data={
           desc:text,
@@ -263,10 +273,14 @@ class DialogList extends Component{
       }
     }
     renderURL=(item)=>{
-       const {text,url}=item;
+       const {url:{autoOpen,iframe,content,url}}=item;
        return (
            <div>
-               <span style={{color:'#4598F0'}} onClick={()=>this.handleUrlChange(url)}>{text}</span>
+               {
+                  iframe ? <Frame src={url} className={Styles.frame}></Frame> : 
+                  <span style={{color:'#4598F0'}} onClick={()=>this.handleUrlChange(url)}>{content}</span>
+               }
+               
            </div>
        )
     }
@@ -291,8 +305,7 @@ class DialogList extends Component{
         }   
     }
 	dealMessageType=(message,kdIntention,dialogList)=>{
-        console.log("message is "+JSON.stringify(message));
-        const {receiveChat,dispatch}=this.props;
+        const {dispatch}=this.props;
         const _this=this;
 		    let result={};
         let type=message && message.type;
@@ -308,8 +321,7 @@ class DialogList extends Component{
                 }
              })
           },()=>{
-              if(kdIntention && kdIntention['status']!='satisfy'){
-                //receiveChat && receiveChat();
+              if(kdIntention && (kdIntention['status']!='satisfy' || kdIntention['status'!='confirmed'])){
                 dispatch({
                   type:ActionType.START_RECORD,
                   payload:{
@@ -329,7 +341,7 @@ class DialogList extends Component{
            break;
            case 'URL':
                let text1='';
-               result={className:'chatbot-dialog',text:message.url.content,id:FilterMaxId(dialogList,'id'),kdIntention,type,url:message.url.url}
+               result={className:'chatbot-dialog',id:FilterMaxId(dialogList,'id'),kdIntention,type,url:message.url}
            break;
            case 'COMFIRM':
 
@@ -351,14 +363,17 @@ class DialogList extends Component{
 		    </li>
 		})
 		return (
+        <div className={`${Styles.scroller}`} ref={el=>this.DialogListWrapper=el}>
            <ul className={`${Styles.dialogList}`} ref={el=>this.DialogListDOM=el}>
               <li style={{height:'58px',display:showTip ? 'flex' : 'none'}}>
 
               </li>
               {
-               	dialogStr
+                dialogStr
               }
            </ul>
+        </div>
+
 		)
 	}
 	render(){
@@ -372,10 +387,6 @@ class DialogList extends Component{
                   this.renderDialogList()
                 }
               </Iscroll>
-
-                {
-                  this.transformDialog()
-                }
                 <Tip visible={showTip} content={this.tipContent} icon={require('../../images/text.png')} onClick={this.handleTipClick}></Tip>
 			</div>
 		)
@@ -389,3 +400,9 @@ export default connect(state=>{
 	    text:state.mainpage.text,
 	})
 })(DialogList);
+
+/*
+                {
+                  this.transformDialog()
+                }
+*/
