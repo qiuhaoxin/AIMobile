@@ -8,6 +8,8 @@ import * as ActionType from '../../action/actionType';
 import {connect} from 'react-redux';
 import {TypeIn,ExpandList,NumberCard,VoiceReceive,Tip,Frame} from 'aicomponents';
 import Iscroll from '../Iscroll';
+import imgPath from '../../images/bus.png';
+import cloneDeep from 'lodash/cloneDeep';
 
 const DIALOG_TITLE="请填写出差事由";
 const GOOD_JOB="谢谢您的认可，来不及认识你，还好在心中留住了你!";
@@ -17,11 +19,18 @@ const TIME_TO_VOICE=12000;
 const urlMapping={
   'BUS_TRIP':'renderExtendBus_tip'
 }
+const bus_trip=[
+    {text:'出发地',number:'user_b_l'},
+    {text:'目的地',number:'user_e_l'},
+    {text:'出发时间',number:'user_b_t'},
+    {text:'返回时间',number:'user_e_t'},
+]
 const SOURCE_ADDRESS="出发地",TARGET_ADDRESS='目的地',BEGIN_TIME="出发时间",BACK_TIME='返回时间';
 class DialogList extends Component{
 	constructor(props){
 		super(props);
     this.timeoutId=-1;
+    this.wrapperHeight=0;
 	}
 	state={
 		dialogList:[],
@@ -30,6 +39,9 @@ class DialogList extends Component{
 	componentWillReceiveProps(nextProps){
         if(nextProps.text){
           this.addUserDialog(nextProps);
+          if(nextProps.text=='提交'){
+            //this.dealBusSubmit();
+          }
         }
         if(nextProps.kdIntention!=null){
           this.addSystemDialog(nextProps);
@@ -62,18 +74,53 @@ class DialogList extends Component{
   }
   translateList=(listHeight)=>{
      if(this.wrapper){
-         this.wrapper.scrollTo(0,-listHeight,200,{});
+         this.wrapper.scrollTo(0,-listHeight,500,{});
      }
+  }
+  delIntention=(props)=>{
+      const {dialogList}=this.state;
+      const _this=this;
+      const dialogListClone=cloneDeep(dialogList);
+      //console.log("dialogListClone is "+JSON.stringify(dialogList));
+      dialogListClone.forEach(item=>{
+        if(item.className=='chatbot-dialog'){
+          item.kdIntention=null;
+        }
+      })
+      console.log("dialogListClone is "+JSON.stringify(dialogListClone));
+      this.setState({
+        dialogList:dialogListClone,
+      },()=>{
+          setTimeout(function(){
+            const listHeight=_this.DialogListWrapper.clientHeight;
+            console.log("listH is "+listHeight);
+            if(listHeight!=0){
+              _this.translateList(listHeight);
+            }
+            const {text}=props;
+            const id=FilterMaxId(dialogList,'id');
+            let tempArr=dialogListClone;
+            tempArr.push({className:'user-dialog',text,id})
+            _this.setState({
+               dialogList:tempArr,
+            })
+          },100)
+      })
   }
   addUserDialog=(props=this.props)=>{
         let {dialogList}=this.state;
+        // if(dialogList.length>0){
+        //    this.delIntention(props);
+        // }
         const listHeight=this.DialogListWrapper.clientHeight;
         if(listHeight!=0){
           this.translateList(listHeight);
         }
-        const {text}=props;
-        const id=FilterMaxId(dialogList,'id');
-        dialogList.push({className:'user-dialog',text,id});
+       // if(dialogList.length==0){
+          const {text}=props;
+          const id=FilterMaxId(dialogList,'id');
+          dialogList.push({className:'user-dialog',text,id});
+        //}
   }
   addSystemDialog=(props=this.props)=>{
         let {dialogList}=this.state;
@@ -94,8 +141,6 @@ class DialogList extends Component{
   }
   dealTip=(info)=>{
         const {intention,kdWordslots,intentionName}=info;
-        //console.log("info is "+intention+" and kdWordslots is "+JSON.stringify(kdWordslots));
-
         if(intention=='BUS_TRIP'){
           const reason=this.getReason(kdWordslots,'user_reason');
           this.tipContent= (reason ? reason : '未完成的')+intentionName;
@@ -141,34 +186,24 @@ class DialogList extends Component{
         }
   }
   handleDialogContent=(wordslot)=>{
-      let b_loc=SOURCE_ADDRESS,e_loc=TARGET_ADDRESS,b_t=BEGIN_TIME,e_t=BACK_TIME;
-      wordslot.forEach(item=>{
-         const number=item.number;
-         switch(number){
-           case 'user_e_l':
-               e_loc=item['originalWord']+'  ('+TARGET_ADDRESS+')';
-           break;
-           case 'user_b_l':
-               b_loc=item['originalWord']+'  ('+SOURCE_ADDRESS+')';
-           break;
-           case 'user_b_t':
-               b_t=item['normalizedWord'];
-           break;
-           case 'user_e_t':
-               e_t=item['normalizedWord'];
-           break;
-         }
-      })
       return (
          <div className={`${Styles['dialogContent']}`}>
-             <div className={`${Styles['dialogContent-left']}`}>
-                 <div className={`${Styles['loc']} ${b_loc!=SOURCE_ADDRESS ? Styles['loc_fill'] : ''}`}>{b_loc}</div>
-                 <div className={`${Styles['loc']} ${b_loc!=TARGET_ADDRESS ? Styles['loc_fill'] : ''}`}>{e_loc}</div>
-             </div>
-             <div className={`${Styles['dialogContent-right']}`}>
-                 <div className={`${Styles['time']} ${b_t!=BEGIN_TIME ? Styles['time_fill'] : ''}`}>{b_t}</div>
-                 <div className={`${Styles['time']} ${b_t!=BACK_TIME ? Styles['time_fill'] : ''}`}>{e_t}</div>
-             </div>
+              <ul>
+                 {
+                  bus_trip.map(item=>{
+                    const tempItem=wordslot.filter(item1=>item1.number==item.number);
+
+                    return <li key={item.number}>
+                        <div className={`${Styles['dialogCotnent-left']}`}>
+                            {item.text}
+                        </div>
+                        <div className={`${Styles['dialogContent-right']}`}>
+                            {tempItem && tempItem.length > 0 ? tempItem[0].normalizedWord : ''}
+                        </div>
+                  </li>
+                  })
+                 }
+              </ul>
          </div>
       )
   }
@@ -183,15 +218,24 @@ class DialogList extends Component{
         location.href=urlStr;
      }
   }
+  //处理出差申请的点击提交按钮效果
+  dealBusSubmit=()=>{
+     const {dialogList}=this.state;
+     const id=FilterMaxId(dialogList,'id');
+     let lastChild=cloneDeep(dialogList.slice(dialogList.length - 2,dialogList.length - 1)[0]);
+     lastChild.id=id;
+     lastChild.showMasker=true;
+     lastChild.text="小K正在为您提交单据，请稍后...";
+     console.log("lastChild is "+JSON.stringify(lastChild));
+     dialogList.push(lastChild);
+  }
   handleDialogSubmit=(item)=>{
      const url=item && item['url'];
-     //const urlStr=url && url['url'];
      const {dispatch,sessionId}=this.props;
-     const {dialogList}=this.state;
      dispatch({
-        type:ActionType.CHAT,
+        type:ActionType.SAY,
         payload:{
-           sessionId,message:'提交'
+           sessionId,text:'提交'
         }
      })
   }
@@ -205,10 +249,11 @@ class DialogList extends Component{
            const wordslot=kdIntention.kdWordslots;
            let reason=wordslot.filter(item=>item.number=='user_reason')[0];
            reason=reason && reason['originalWord'];
-           return <TypeIn title={reason ? reason : DIALOG_TITLE} kdIntention={kdIntention} className={Styles.dialog} say={text} content={()=>this.handleDialogContent(kdIntention['kdWordslots'])} 
-           onSubmit={kdIntention.status=='confirm' ? ()=>_this.handleDialogSubmit(item) : null}>
-               {item.type=='URL' ? this[urlMapping[kdIntention['intention']]] : null}
-           </TypeIn>
+           return <TypeIn imgPath={imgPath} title={reason ? reason : DIALOG_TITLE} kdIntention={kdIntention} className={Styles.dialog} say={text} 
+                     content={()=>this.handleDialogContent(kdIntention['kdWordslots'])} 
+                     onSubmit={kdIntention.status=='confirm' ? ()=>_this.handleDialogSubmit(item) : null} showMasker={item.showMasker}>
+                       {item.type=='URL' ? this[urlMapping[kdIntention['intention']]] : null}
+                  </TypeIn>
         }else if(kdIntention!=null && kdIntention['intention'] && kdIntention['intention'].toLowerCase()=='enquire_financial_indicators'){
            return <TypeIn say={text}></TypeIn>
         }else{
@@ -232,6 +277,14 @@ class DialogList extends Component{
     renderNumberCard=(item)=>{
        const {message}=item;
        const {numberCard}=message;
+       console.log("numberCard is "+JSON.stringify(numberCard));
+       numberCard.desc=numberCard.desc.replace('您好','');
+       if(numberCard && numberCard.numeralDetail){
+          numberCard.numeralDetail.forEach(item=>{
+             console.log("item is "+JSON.stringify(item));
+             item.value=item.value.replace('人民币','');
+          })
+       }
        return <NumberCard data={numberCard}></NumberCard>
 
     }

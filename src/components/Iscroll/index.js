@@ -82,7 +82,6 @@ class Iscroll extends Component{
     	}
     }
     scrollBy=(x,y,time,easing)=>{
-        console.log("y is "+y);
     	this.iScrollInstance.scrollBy(x,y,time,null,true);
     }
     scrollTo=(x,y,time,easing)=>{
