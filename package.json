@@ -16,7 +16,7 @@
   "author": "haoxin_qiu",
   "license": "ISC",
   "dependencies": {
-    "aicomponents": "^1.9.8",
+    "aicomponents": "^2.1.4",
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
     "babel-polyfill": "^6.26.0",
     "classnames": "^2.2.6",

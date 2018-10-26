@@ -21,10 +21,13 @@ class AppTips extends Component{
 		)
 	}
 	render(){
-		const {desc,visible}=this.props;
+		const {desc,visible,appTitle}=this.props;
         const classNameStr=visible ? 'ai-at-show' : 'ai-at-hide';
 		return (
 			<div className={`${Styles.wrapper} ${Styles[classNameStr]}`}>
+			    <div className={`${Styles.title}`}>
+                    {appTitle}
+			    </div>
                 <div className={`${Styles.tipMsg}`}>
                     {desc}
                 </div>
@@ -36,7 +39,7 @@ class AppTips extends Component{
 	}
 }
 AppTips.defaultProps={
-	desc:'您可以这么说',
+	desc:'你可以跟我这么说',
 	visible:false,
 }
 AppTips.propTypes={

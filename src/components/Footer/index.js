@@ -29,17 +29,20 @@ class Footer extends Component{
   }
   state={
       showWave:false,
-      //localId:-1
   }
   componentWillReceiveProps(nextProps){
-      if(nextProps.startRecord){
-        this.handleClickBall();
+      if(nextProps.startRecord==true){
+         //开启录音
+         this.handleClickBall();
+      }
+      if(nextProps.startRecord==false){
+          this.setState({
+            showWave:false,
+          })
+          stopSpeech();
       }
       if(nextProps.localId && nextProps.localId!=-1){
          this.localId=nextProps.localId;
-         // this.setState({
-         //    localId:nextProps.localId,
-         // })
       }
   }
   checkyyAP=()=>{

@@ -32,6 +32,7 @@ class MainPage extends Component{
     state={
        canSayArr:[],
        appTipsVisible:false,
+       appTitle:'',
        dialog:null,
        showDialogList:false,
        showRecommend:true,
@@ -149,6 +150,7 @@ class MainPage extends Component{
         this.fetchMainPageData();
     }
     handleItemClick=(item)=>{
+      console.log("item is "+JSON.stringify(item));
        const {dispatch}=this.props;
        dispatch({
           type:ActionType.FETCH_INTENTION_SAMPLES,
@@ -160,6 +162,7 @@ class MainPage extends Component{
        this.hideMainPage();
        this.setState({
           appTipsVisible:true,
+          appTitle:item.ftitle,
        })
     }
     //处理Footer的文字/语音输入
@@ -197,7 +200,7 @@ class MainPage extends Component{
     }
     render(){
       const {title,appList,sessionId,dispatch,appMessage}=this.props;
-      const {appTipsVisible,showDialogList,showRecommend}=this.state;
+      const {appTipsVisible,showDialogList,showRecommend,appTitle}=this.state;
       //console.log("appMessage is "+JSON.stringify(appMessage));
       return (
          <div className={Styles.wrapper}>
@@ -213,7 +216,7 @@ class MainPage extends Component{
               </div>
 
               <div ref={el=>this.AppTip=el}>
-                 <AppTips visible={appTipsVisible} appTips={appMessage}></AppTips>
+                 <AppTips visible={appTipsVisible} appTips={appMessage} appTitle={appTitle}></AppTips>
               </div>
 
               <div>

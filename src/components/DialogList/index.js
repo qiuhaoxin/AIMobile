@@ -6,7 +6,7 @@ import {isEmpty,FilterMaxId,saveInLocalStorage,getInLocalStorage} from '../../ut
 import {isYZJ,speak,backYZJ,playVoice,stopPlayVoice,startSpeech,stopSpeech} from '../../utils/yzj';
 import * as ActionType from '../../action/actionType';
 import {connect} from 'react-redux';
-import {TypeIn,ExpandList,NumberCard,VoiceReceive,Tip,Frame} from 'aicomponents';
+import {TypeIn,ExpandList,NumberCard,VoiceReceive,Tip,Frame,Input} from 'aicomponents';
 import Iscroll from '../Iscroll';
 import imgPath from '../../images/bus.png';
 import cloneDeep from 'lodash/cloneDeep';
@@ -31,21 +31,37 @@ class DialogList extends Component{
 		super(props);
     this.timeoutId=-1;
     this.wrapperHeight=0;
+    this.localId=-1;
 	}
 	state={
 		dialogList:[],
     showTip:false,
+    dialogRemove:false,
 	}
 	componentWillReceiveProps(nextProps){
-        if(nextProps.text){
-          this.addUserDialog(nextProps);
-          if(nextProps.text=='提交'){
-            //this.dealBusSubmit();
-          }
+        console.log("nextProps is "+JSON.stringify(nextProps));
+        const result=this.haveRemoveCard(this.props,nextProps);
+        if(this.props.dialogList.length!=nextProps.dialogList.length){
+          this.setState({
+            dialogList:nextProps.dialogList,
+            dialogRemove:result,
+          },()=>{
+            const list=nextProps.dialogList;
+            let temp=list.slice(list.length - 1);
+            temp=temp[0];
+            if(temp && temp.text=='提交'){
+            }
+          })
         }
-        if(nextProps.kdIntention!=null){
-          this.addSystemDialog(nextProps);
-        }
+        // if(nextProps.text){
+        //   this.addUserDialog(nextProps);
+        //   if(nextProps.text=='提交'){
+        //     //this.dealBusSubmit();
+        //   }
+        // }
+        // if(nextProps.kdIntention!=null){
+        //   this.addSystemDialog(nextProps);
+        // }
 	}
   componentDidMount(){
       const dialogList=getInLocalStorage('dialog');
@@ -56,11 +72,23 @@ class DialogList extends Component{
         })
       }
   }
+  haveRemoveCard=(props,nextProps)=>{
+
+    const tempProps=cloneDeep(props.dialogList.filter(item=>item.className=='chatbot-dialog'));
+    const tempNextProps=cloneDeep(nextProps.dialogList.filter(item=>item.className=='chatbot-dialog'));
+    if(tempProps.length==tempNextProps.length)return false;
+    let temp=tempNextProps.slice(tempNextProps.length - 2,tempNextProps.length - 1);
+    if(temp[0] && temp[0].showBody==false){
+        return true;
+    }
+    return false;
+  }
 	chat=(text)=>{
 		const {dispatch,sessionId}=this.props;
 		dispatch({
-			type:ActionType.CHAT,
-			payload:{sessionId,message:text},
+			//type:ActionType.CHAT,
+      type:ActionType.SAY,
+			payload:{sessionId,text},
 		})
 	}
   transformDialog=()=>{
@@ -72,9 +100,9 @@ class DialogList extends Component{
           },TIME_TO_SCROLL)
       }
   }
-  translateList=(listHeight)=>{
+  translateList=(listHeight,time)=>{
      if(this.wrapper){
-         this.wrapper.scrollTo(0,-listHeight,500,{});
+         this.wrapper.scrollTo(0,-listHeight,time,{});
      }
   }
   delIntention=(props)=>{
@@ -87,13 +115,13 @@ class DialogList extends Component{
           item.kdIntention=null;
         }
       })
-      console.log("dialogListClone is "+JSON.stringify(dialogListClone));
+      //console.log("dialogListClone is "+JSON.stringify(dialogListClone));
       this.setState({
         dialogList:dialogListClone,
       },()=>{
           setTimeout(function(){
             const listHeight=_this.DialogListWrapper.clientHeight;
-            console.log("listH is "+listHeight);
+           // console.log("listH is "+listHeight);
             if(listHeight!=0){
               _this.translateList(listHeight);
             }
@@ -133,6 +161,7 @@ class DialogList extends Component{
         dialogList.push(result);
         this.dealDialogEnd(status);
   }
+
   getReason=(kdWordslots,key)=>{
        const result=kdWordslots.filter(kdWordslot=>kdWordslot['number']==key)[0];
        if(result){
@@ -165,6 +194,7 @@ class DialogList extends Component{
       })
       
   }
+  //用户反馈
   dealDialogEnd=(status)=>{
         const _this=this;
         let {dialogList}=this.state;
@@ -225,6 +255,7 @@ class DialogList extends Component{
      let lastChild=cloneDeep(dialogList.slice(dialogList.length - 2,dialogList.length - 1)[0]);
      lastChild.id=id;
      lastChild.showMasker=true;
+
      lastChild.text="小K正在为您提交单据，请稍后...";
      console.log("lastChild is "+JSON.stringify(lastChild));
      dialogList.push(lastChild);
@@ -241,7 +272,7 @@ class DialogList extends Component{
   }
 	//渲染对话框
     renderDialog=(item)=>{
-        const {kdIntention,type,text}=item;
+        const {kdIntention,type,message:{text}}=item;
         const _this=this;
         const {say}=kdIntention;
         const {dialogList}=this.props;
@@ -249,44 +280,70 @@ class DialogList extends Component{
            const wordslot=kdIntention.kdWordslots;
            let reason=wordslot.filter(item=>item.number=='user_reason')[0];
            reason=reason && reason['originalWord'];
-           return <TypeIn imgPath={imgPath} title={reason ? reason : DIALOG_TITLE} kdIntention={kdIntention} className={Styles.dialog} say={text} 
-                     content={()=>this.handleDialogContent(kdIntention['kdWordslots'])} 
+           return <TypeIn ref={el=>this[`typein`]=el} imgPath={imgPath} title={reason ? reason : DIALOG_TITLE} kdIntention={kdIntention} className={Styles.dialog} say={text} 
+                     content={()=>this.handleDialogContent(kdIntention['kdWordslots'])} showBody={item.showBody}
                      onSubmit={kdIntention.status=='confirm' ? ()=>_this.handleDialogSubmit(item) : null} showMasker={item.showMasker}>
                        {item.type=='URL' ? this[urlMapping[kdIntention['intention']]] : null}
                   </TypeIn>
         }else if(kdIntention!=null && kdIntention['intention'] && kdIntention['intention'].toLowerCase()=='enquire_financial_indicators'){
-           return <TypeIn say={text}></TypeIn>
+           return <TypeIn say={text} showBody={false}></TypeIn>
         }else{
-          return <TypeIn say={text}></TypeIn>
+          return <TypeIn say={text} showBody={false}></TypeIn>
         }
     }
     handleSelectItemClick=(item)=>{
+      //如果有播报停止播报
+       this.stopVoice;
        let tempArr=this.state.dialogList;
-       const _this=this;
        const {sessionId,dispatch}=this.props;
        this.chat(item.desc);
     }
     renderSelect=(item)=>{
-       const {data,text,title,kdIntention}=item;
+       //const {data,text,title,kdIntention}=item;
+       const {message:{selects,text},kdIntention}=item;
        this.data={
            desc:kdIntention.say,
-           list:data
+           list:selects,
       }
-       return <ExpandList data={this.data} title={title} itemKey='id' onItemClick={this.handleSelectItemClick}></ExpandList>
+       return <ExpandList data={this.data} title={text} itemKey='id' onItemClick={this.handleSelectItemClick}></ExpandList>
     }
     renderNumberCard=(item)=>{
        const {message}=item;
        const {numberCard}=message;
-       console.log("numberCard is "+JSON.stringify(numberCard));
        numberCard.desc=numberCard.desc.replace('您好','');
        if(numberCard && numberCard.numeralDetail){
           numberCard.numeralDetail.forEach(item=>{
-             console.log("item is "+JSON.stringify(item));
+             //console.log("item is "+JSON.stringify(item));
              item.value=item.value.replace('人民币','');
           })
        }
        return <NumberCard data={numberCard}></NumberCard>
 
+    }
+    stopVoice=()=>{
+        const _this=this;
+        const {dispatch}=this.props;
+        if(this.localId!=-1){
+          try{
+            stopPlayVoice(this.localId,()=>{
+               _this.localId=-1;
+               dispatch({
+                  type:ActionType.LOCAL_ID,
+                  payload:{
+                    localId:-1,
+                  }
+               })
+               dispatch({
+                  type:ActionType.START_RECORD,
+                  payload:{
+                    startRecord:false,
+                  },
+               })
+            })
+          }catch(e){
+             alert("e is "+e);
+          }
+        }
     }
     hardToUpdate=(obj)=>{
        const tempArr=this.state.dialogList;
@@ -326,7 +383,7 @@ class DialogList extends Component{
       }
     }
     renderURL=(item)=>{
-       const {url:{autoOpen,iframe,content,url}}=item;
+       const {message:{url:{autoOpen,iframe,content,url}}}=item;
        return (
            <div>
                {
@@ -337,26 +394,78 @@ class DialogList extends Component{
            </div>
        )
     }
+    playMessageVoice=(item)=>{
+       const _this=this;
+       const {dispatch}=this.props;
+       const className=item.className;
+       if(className=='user-dialog')return;
+       const {message,kdIntention}=item;
+       if(isYZJ() && message.text && !isEmpty(message.text)){
+          //
+          playVoice(message.text,(localId)=>{
+             _this.localId=localId;
+             dispatch({
+                type:ActionType.LOCAL_ID,
+                payload:{
+                    localId
+                }
+             })
+          },()=>{
+              //播报完后如果再同一个流程内则自动开启录音 
+              if(kdIntention && (kdIntention['status']!='satisfy' && kdIntention['status']!='confirmed')){
+                dispatch({
+                  type:ActionType.START_RECORD,
+                  payload:{
+                    startRecord:true,
+                  },
+                })
+              }
+          })
+        }
+    }
+    transform=()=>{
+        const {dialogList,dialogRemove}=this.state;
+        let listHeight=this.DialogListWrapper && this.DialogListWrapper.clientHeight;
+        let cardHeight=0;
+        if(dialogList.length % 2 ==1){
+          if(listHeight!=0){
+              this.translateList(listHeight,500);
+          }
+        }else{
+          if(listHeight!=0){
+              if(this.typein){
+                cardHeight =this.typein.getCardHeight();
+              }
+              listHeight=dialogRemove ? (listHeight - cardHeight - 44 - 48) : (listHeight -44 -48); // 22:问题的行高
+              if(dialogList.length>2){
+                 this.translateList(listHeight,0);
+              }
+          }
+        }
+    }
     renderGUI=(item)=> {
-        const type=item.type;
+        const _this=this;
+        this.playMessageVoice(item);
+        const type=item.message && item.message.type;
         switch(type){
           case 'SELECTS':
-            return this.renderSelect(item);
+            return _this.renderSelect(item);
           break;
           case 'TEXT':
-            return this.renderDialog(item);
+            return _this.renderDialog(item);
           break;
           case 'URL':
-            return this.renderURL(item);
+            return _this.renderURL(item);
           break;
           case 'NUMBER_CARD':
-            return this.renderNumberCard(item);
+            return _this.renderNumberCard(item);
           break;
           case 'VOICERECEIVE':
-            return this.renderVoiceReceive(item);
+            return _this.renderVoiceReceive(item);
           break;
-        }   
+        }  
     }
+
 	dealMessageType=(message,kdIntention,dialogList)=>{
         const {dispatch}=this.props;
         const _this=this;
@@ -374,7 +483,8 @@ class DialogList extends Component{
                 }
              })
           },()=>{
-              if(kdIntention && (kdIntention['status']!='satisfy' || kdIntention['status'!='confirmed'])){
+              if(kdIntention && (kdIntention['status']!='satisfy' && kdIntention['status']!='confirmed')){
+                console.log("kai qi lu yin");
                 dispatch({
                   type:ActionType.START_RECORD,
                   payload:{
@@ -405,13 +515,18 @@ class DialogList extends Component{
         }
 		return result;
 	}
+  handleAfterEnter=(inputValue)=>{
+    console.log("inputValu222e is "+inputValue);
+
+  }
 	renderDialogList=()=>{
-		const {dialogList,showTip}=this.state;
+		const {dialogList,showTip}=this.state; 
+
 		const dialogStr=dialogList.map(item=>{
 			const classNameStr=item.className;
 			return <li key={item.id} className={`${Styles[classNameStr]} ${Styles['dialog-row']}`}>
 			    {
-			    	item.kdIntention || item.type=='VOICERECEIVE' ? this.renderGUI(item) : <div className={Styles.textLine}>{item.text}</div>
+			    	item.kdIntention || item.type=='VOICERECEIVE' ? this.renderGUI(item) : <Input text={item.text}  afterEnter={this.handleAfterEnter}/>
 			    }
 		    </li>
 		})
@@ -423,6 +538,9 @@ class DialogList extends Component{
               </li>
               {
                 dialogStr
+              }
+              {
+                this.transform()
               }
            </ul>
         </div>
@@ -447,15 +565,20 @@ class DialogList extends Component{
 }
 export default connect(state=>{
 	return ({
-	    message:state.mainpage.message,
-	    kdIntention:state.mainpage.kdIntention,
-	    lastUnfinishedIntention:state.mainpage.lastUnfinishedIntention,
-	    text:state.mainpage.text,
+      dialogList:state.mainpage.dialogList,
 	})
 })(DialogList);
 
 /*
+<div className={Styles.textLine}>{item.text}</div>
                 {
                   this.transformDialog()
                 }
+
+
+
+                      message:state.mainpage.message,
+      kdIntention:state.mainpage.kdIntention,
+      lastUnfinishedIntention:state.mainpage.lastUnfinishedIntention,
+      text:state.mainpage.text,
 */

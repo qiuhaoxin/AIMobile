@@ -1,8 +1,8 @@
 import {put,take,call,cancel,fork} from 'redux-saga/effects';
-import {takeEvery,takeLastest,all} from 'redux-saga';//高级API
+import {takeEvery,takeLastest,all,delay} from 'redux-saga';//高级API
 import * as ActionType from '../action/actionType';
 import {getMainPageData,uploadLoc,tongyinConvert,chat,getChatSessionId,EXCEPTION,getSamples} from '../services/api';
-
+console.log("delay is "+delay);
 //获取chatbot主页的应用列表
 function* getMainPageDataAPI (payload){
 	try{
@@ -28,11 +28,13 @@ function* tongyinConvertAPI (payload){
 
 function* getChatSessionIdAPI(payload){
 	try{
-       const response=yield call(getChatSessionId,payload.payload);
-       yield put({
-       	 type:ActionType.DEAL_SESSION_ID,
-       	 payload:response.chatSessionID,
-       })
+       //setTimeout(function(){
+         const response=yield call(getChatSessionId,payload.payload);
+         yield put({
+           type:ActionType.DEAL_SESSION_ID,
+           payload:response.chatSessionID,
+         })
+       //},300)
 	}catch(e){
       alert("exception in saga/getChatSessionIdAPI is "+e);
 	}
@@ -49,7 +51,6 @@ function* chatAPI(payload){
         	payload:{
         		message:JSON.parse(response['message']),
         		kdIntention:JSON.parse(response['kdIntention']),
-        		//text:payload.message,//payload.message
             text:'',
         		lastUnfinishedIntention:response['lastUnfinishedIntention'] && JSON.parse(response['lastUnfinishedIntention']),
         	},
@@ -61,10 +62,7 @@ function* chatAPI(payload){
 
 function* getSamplesAPI(payload){
    try{
-       console.log("getSamplesAPI is "+JSON.stringify(payload));
        const response=yield call(getSamples,payload.payload);
-       console.log("response is "+JSON.stringify(response));
-
    }catch(e){
       alert("exception is getSamplesAPI/saga is "+e);
    }
