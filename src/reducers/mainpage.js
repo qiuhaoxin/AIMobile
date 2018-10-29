@@ -34,23 +34,22 @@ const mainpage=(state=initState,action)=>{
 
         case ActionType.DEAL_TONGYIN_CONVERT:
             const dialogList=state.dialogList;
-            console.log("dialogList is "+JSON.stringify(dialogList));
             let tempList2=cloneDeep(dialogList);
             const id=FilterMaxId(dialogList,'id');
             tempList2.push({text:action.payload.text,id,className:'user-dialog'});
-            console.log("action.payload.text is "+action.payload.text);
             if(action.payload.text=='提交'){
+             // console.log("tempList2 is "+JSON.stringify(tempList2));
               let tempObj=tempList2.slice(tempList2.length - 2,tempList2.length - 1);
+
+              tempObj[0].showBody=false;
               const listId=FilterMaxId(tempList2,'id');
               tempObj=cloneDeep(tempObj && tempObj[0]);
-              console.log("tempObj is "+JSON.stringify(tempObj)+" and listid is "+listId);
               tempObj.id=listId;
               tempObj.message.text="小K正在为您提交单据，请稍后...";
-              console.log("tempObj is "+JSON.stringify(tempObj));
+              tempObj.showMasker=true;
+              tempObj.showBody=true;
               tempList2.push(tempObj);
             }
-            console.log("tempList2  is "+JSON.stringify(tempList2));
-            //console.log("action.payload.text is "+action.payload.text);
             return {
               ...state,
               ...action.payload,
@@ -63,7 +62,6 @@ const mainpage=(state=initState,action)=>{
             const tempList=state.dialogList;
             let tempList3=cloneDeep(tempList);
             const maxId=FilterMaxId(tempList,'id');
-            console.log("maxId is "+maxId);
             let temp={id:maxId,className:'chatbot-dialog'};
             temp={
               ...temp,

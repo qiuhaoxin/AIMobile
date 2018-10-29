@@ -46,6 +46,7 @@ function* chatAPI(payload){
     }
     try{
         const response=yield call(chat,payload);
+
         yield put({
         	type:ActionType.DEAL_CHAT,
         	payload:{
@@ -119,10 +120,8 @@ function* watchSayAPI(){
 	while(true){
        try{
 		   const payload=yield take(ActionType.SAY);
-       //console.log("payload is "+JSON.stringify(payload));
 		   const sessionId=payload.payload.sessionId;
 		   const response=yield call(tongyinConvertAPI,payload.payload);
-       //console.log("tongyinConvert result is "+JSON.stringify(response));
        yield put({
           type:ActionType.DEAL_TONGYIN_CONVERT,
           payload:{
@@ -130,10 +129,13 @@ function* watchSayAPI(){
             kdIntention:null,
           }
        })
-		   yield call(chatAPI,{sessionId,message:response.text});
-       }catch(e){
-          alert("exception in watchSayAPI is "+e);
-       }
+       //console.log("response is "+JSON.stringify(response));
+        // if(response.text!='提交'){
+           yield call(chatAPI,{sessionId,message:response.  text});
+         //}
+      }catch(e){
+            alert("exception in watchSayAPI is "+e);
+         }
 	}
 }
 
@@ -141,7 +143,6 @@ function* watchLocalID(){
   while(true){
     try{
       const payload=yield take(ActionType.LOCAL_ID);
-      //alert("payload saga is "+JSON.stringify(payload));
       yield put({
          type:ActionType.SAVE_LOCAL_ID,
          payload:payload.payload.localId,

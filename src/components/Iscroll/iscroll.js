@@ -712,7 +712,7 @@ IScroll.prototype = {
 		this.scrollerHeight	= rect.height;
         //console.log("scrollerHeight 55555 is "+this.scrollerHeight)
 		this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
-		this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
+		this.maxScrollY		= this.wrapperHeight - this.scrollerHeight - 30;
 /* REPLACE END: refresh */
 
 		this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;

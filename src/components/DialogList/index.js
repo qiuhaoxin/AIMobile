@@ -39,7 +39,6 @@ class DialogList extends Component{
     dialogRemove:false,
 	}
 	componentWillReceiveProps(nextProps){
-        console.log("nextProps is "+JSON.stringify(nextProps));
         const result=this.haveRemoveCard(this.props,nextProps);
         if(this.props.dialogList.length!=nextProps.dialogList.length){
           this.setState({
@@ -47,21 +46,8 @@ class DialogList extends Component{
             dialogRemove:result,
           },()=>{
             const list=nextProps.dialogList;
-            let temp=list.slice(list.length - 1);
-            temp=temp[0];
-            if(temp && temp.text=='提交'){
-            }
           })
         }
-        // if(nextProps.text){
-        //   this.addUserDialog(nextProps);
-        //   if(nextProps.text=='提交'){
-        //     //this.dealBusSubmit();
-        //   }
-        // }
-        // if(nextProps.kdIntention!=null){
-        //   this.addSystemDialog(nextProps);
-        // }
 	}
   componentDidMount(){
       const dialogList=getInLocalStorage('dialog');
@@ -73,7 +59,6 @@ class DialogList extends Component{
       }
   }
   haveRemoveCard=(props,nextProps)=>{
-
     const tempProps=cloneDeep(props.dialogList.filter(item=>item.className=='chatbot-dialog'));
     const tempNextProps=cloneDeep(nextProps.dialogList.filter(item=>item.className=='chatbot-dialog'));
     if(tempProps.length==tempNextProps.length)return false;
@@ -86,7 +71,6 @@ class DialogList extends Component{
 	chat=(text)=>{
 		const {dispatch,sessionId}=this.props;
 		dispatch({
-			//type:ActionType.CHAT,
       type:ActionType.SAY,
 			payload:{sessionId,text},
 		})
@@ -137,18 +121,13 @@ class DialogList extends Component{
   }
   addUserDialog=(props=this.props)=>{
         let {dialogList}=this.state;
-        // if(dialogList.length>0){
-        //    this.delIntention(props);
-        // }
         const listHeight=this.DialogListWrapper.clientHeight;
         if(listHeight!=0){
           this.translateList(listHeight);
         }
-       // if(dialogList.length==0){
-          const {text}=props;
-          const id=FilterMaxId(dialogList,'id');
-          dialogList.push({className:'user-dialog',text,id});
-        //}
+        const {text}=props;
+        const id=FilterMaxId(dialogList,'id');
+        dialogList.push({className:'user-dialog',text,id});
   }
   addSystemDialog=(props=this.props)=>{
         let {dialogList}=this.state;
@@ -281,8 +260,8 @@ class DialogList extends Component{
            let reason=wordslot.filter(item=>item.number=='user_reason')[0];
            reason=reason && reason['originalWord'];
            return <TypeIn ref={el=>this[`typein`]=el} imgPath={imgPath} title={reason ? reason : DIALOG_TITLE} kdIntention={kdIntention} className={Styles.dialog} say={text} 
-                     content={()=>this.handleDialogContent(kdIntention['kdWordslots'])} showBody={item.showBody}
-                     onSubmit={kdIntention.status=='confirm' ? ()=>_this.handleDialogSubmit(item) : null} showMasker={item.showMasker}>
+                     content={()=>this.handleDialogContent(kdIntention['kdWordslots'])} showBody={item.showBody} showMasker={item.showMasker}
+                     onSubmit={kdIntention.status=='confirm' ? ()=>_this.handleDialogSubmit(item) : null} >
                        {item.type=='URL' ? this[urlMapping[kdIntention['intention']]] : null}
                   </TypeIn>
         }else if(kdIntention!=null && kdIntention['intention'] && kdIntention['intention'].toLowerCase()=='enquire_financial_indicators'){
@@ -383,7 +362,22 @@ class DialogList extends Component{
       }
     }
     renderURL=(item)=>{
-       const {message:{url:{autoOpen,iframe,content,url}}}=item;
+       const {message:{url:{autoOpen,iframe,content,url}},kdIntention}=item;
+       console.log("kdIntention is "+JSON.stringify(kdIntention));
+       if(kdIntention.intention=='BUS_TRIP' && kdIntention.status=='confirmed'){
+           const wordslot=kdIntention.kdWordslots;
+           let reason=wordslot.filter(item=>item.number=='user_reason')[0];
+           reason=reason && reason['originalWord'];
+           console.log("reas is "+reason);
+           return (
+              <div> 
+                  <TypeIn say={`已成功提交单据`} content={()=>this.handleDialogContent(kdIntention['kdWordslots'])}
+                  imgPath={imgPath} status={true} title={reason ? reason : DIALOG_TITLE}>
+
+                  </TypeIn>
+              </div>
+           )
+       }
        return (
            <div>
                {
@@ -401,7 +395,6 @@ class DialogList extends Component{
        if(className=='user-dialog')return;
        const {message,kdIntention}=item;
        if(isYZJ() && message.text && !isEmpty(message.text)){
-          //
           playVoice(message.text,(localId)=>{
              _this.localId=localId;
              dispatch({
@@ -427,7 +420,12 @@ class DialogList extends Component{
         const {dialogList,dialogRemove}=this.state;
         let listHeight=this.DialogListWrapper && this.DialogListWrapper.clientHeight;
         let cardHeight=0;
-        if(dialogList.length % 2 ==1){
+        let lastChild=dialogList.slice(dialogList.length - 1);
+        if(lastChild && lastChild.length > 0){
+          lastChild=lastChild[0];
+        }
+        const className=lastChild && lastChild.className;
+        if(className==='user-dialog'){//dialogList.length % 2 ==1
           if(listHeight!=0){
               this.translateList(listHeight,500);
           }
@@ -436,7 +434,13 @@ class DialogList extends Component{
               if(this.typein){
                 cardHeight =this.typein.getCardHeight();
               }
-              listHeight=dialogRemove ? (listHeight - cardHeight - 44 - 48) : (listHeight -44 -48); // 22:问题的行高
+              listHeight=dialogRemove ? (listHeight - cardHeight - 22 - 48) : (listHeight -22 -48); // 22:问题的行高
+              if(lastChild && lastChild.showMasker){
+                listHeight += 70;
+              }
+              if(lastChild && lastChild.kdIntention && lastChild.kdIntention.intention=='BUS_TRIP' && lastChild.kdIntention.status=='confirmed'){
+                listHeight+=70;
+              }
               if(dialogList.length>2){
                  this.translateList(listHeight,0);
               }
@@ -526,7 +530,7 @@ class DialogList extends Component{
 			const classNameStr=item.className;
 			return <li key={item.id} className={`${Styles[classNameStr]} ${Styles['dialog-row']}`}>
 			    {
-			    	item.kdIntention || item.type=='VOICERECEIVE' ? this.renderGUI(item) : <Input text={item.text}  afterEnter={this.handleAfterEnter}/>
+			    	item.kdIntention || item.type=='VOICERECEIVE' ? this.renderGUI(item) : <div className={Styles.textLine}>{item.text}</div>
 			    }
 		    </li>
 		})
@@ -570,6 +574,7 @@ export default connect(state=>{
 })(DialogList);
 
 /*
+<Input text={item.text}  afterEnter={this.handleAfterEnter}/>
 <div className={Styles.textLine}>{item.text}</div>
                 {
                   this.transformDialog()

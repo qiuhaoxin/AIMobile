@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import className from 'classnames';
 import Styles from './index.less';
-import {RecommendCard} from 'aicomponents';
+import {RecommendCard,BackIcon} from 'aicomponents';
 import {connect} from 'react-redux';
 import * as ActionType from '../../action/actionType';
 import {isYZJ,getNetWorkType,getLocation,speak,getYZJLang,getOS,backYZJ,playVoice,stopPlayVoice,startSpeech,stopSpeech} from '../../utils/yzj';
@@ -198,13 +198,25 @@ class MainPage extends Component{
         },TIME_TO_HIDE)
       }
     }
+    handleIconClick=(e)=>{
+       const _this=this;
+       this.setState({
+         showRecommend:true,
+         appTipsVisible:false,
+         showDialogList:false,
+       },()=>{
+          if(this.ContentTip){
+             this.ContentTip.style['display']='block';
+             this.ContentTip.style['transform']=`translate(0,0)`;
+          }
+       })
+    }
     render(){
       const {title,appList,sessionId,dispatch,appMessage}=this.props;
       const {appTipsVisible,showDialogList,showRecommend,appTitle}=this.state;
       //console.log("appMessage is "+JSON.stringify(appMessage));
       return (
          <div className={Styles.wrapper}>
-
             <div className={Styles.header} ref={el=>this.Header=el}>
               <div className={Styles.contentTip} ref={el=>this.ContentTip=el} style={{display:!showDialogList ? 'block' : 'none'}}>
                  <div className={Styles.rowTitle}>
@@ -220,11 +232,12 @@ class MainPage extends Component{
               </div>
 
               <div>
-                  <DialogList visible={this.state.showDialogList} sessionId={sessionId} dispatch={dispatch}>
+                  <DialogList visible={showDialogList} sessionId={sessionId} dispatch={dispatch}>
                   </DialogList>
               </div>
             </div>
             <Footer sessionId={sessionId} dispatch={this.props.dispatch} onEnterClick={this.handleInput}></Footer>
+            <BackIcon visible={showDialogList || appTipsVisible} onIconClick={this.handleIconClick}/>
          </div>
       )
     }

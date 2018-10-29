@@ -11,6 +11,8 @@ let isSupportYZJApi=true;
 let talk=startSpeech;
 let stopTalk=stopSpeech;
 
+const RECORDING_TIPS="你说,我在听...";
+const START_RECORD="点我，对我说...";
 class Footer extends Component{
 	constructor(props){
 		super(props);
@@ -185,7 +187,6 @@ class Footer extends Component{
             autostart: true,
             style: 'ios9',
             clickCB:function(){
-              //stopTalk && stopTalk(()=>_this.changeSpeakStyle('block','none'))  
               _this.setState({
                 showWave:false,
               })
@@ -209,6 +210,11 @@ class Footer extends Component{
     const {showWave}=this.state;
 		return (
            <div className={Styles.wrapper}>
+                <div className={Styles.tips}>
+                      {
+                          showWave ? RECORDING_TIPS : START_RECORD
+                      }
+                </div>
                 <div ref={el=>this.SpeakIcon=el} style={{display:showWave ? 'none' : 'block'}}>
                  {
                        isYZJ() ? 
